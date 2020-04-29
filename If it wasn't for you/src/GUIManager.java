@@ -2,8 +2,8 @@ import DEBUGCONSOLE.DebugConsole;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
 public class GUIManager {
@@ -14,9 +14,12 @@ public class GUIManager {
     static Player player;
     private static TarotDeck deck;
     private static ArrayList<Collider> colliders = new ArrayList<>();
-    private static DebugConsole debugConsole = new DebugConsole();
+    public static DebugConsole debugConsole = new DebugConsole();
+    //Debug Variables
+    private static Position mousePos = new Position(0,0);
 
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
         deck = new TarotDeck();
         deck.Shuffle();
         Initialize();
@@ -33,18 +36,27 @@ public class GUIManager {
         eGui.add(playArea);
         playArea.setPreferredSize(new Dimension(500, 500));
         playArea.setLayout(new BorderLayout());
+        playArea.setBorder(BorderFactory.createTitledBorder("Play Area"));
         //Enable window
         eGui.setVisible(true);
 
         //Add the first card
         TarotCard testCard = deck.GetCard(0);
-        testCard.setPosition(50, 50);
+        testCard.setPosition(150, 230);
         playArea.add(testCard);
+        testCard.flip();
+
+        //Add MarketCollider
+        SceneObject testCollider = new SceneObject(new Position(100,100), "Market Tent");
+        testCollider.ScaleSprite(1.4);
+        testCollider.myCol.UpdateCollider();
+        playArea.add(testCollider);
+        eGui.revalidate();
 
         //Add the player
-        player = new Player(new Position(200, 200));
+        player = new Player(new Position(250, 200));
         playArea.add(player);
-        playArea.setBorder(BorderFactory.createTitledBorder("Play Area"));
+
         //Add player keylisteners
         eGui.addKeyListener(new KeyAdapter() {
             @Override
@@ -69,15 +81,22 @@ public class GUIManager {
                 player.setMoving(false, e.getKeyChar());
             }
         });
+        eGui.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                super.mouseMoved(e);
+                mousePos = new Position(e.getX(), e.getY());
+            }
+        });
 
         eGui.pack();
-        eGui.revalidate();
         //Start the gameUpdate
         GameUpdate();
     }
 
     private static void GameUpdate() {
         while (eGui.isVisible()) {
+            //Update debug variables
             //Player Update
             player.Update();
 
@@ -103,5 +122,10 @@ public class GUIManager {
     public static ArrayList<Collider> GetColliders()
     {
         return colliders;
+    }
+
+    public static Position GetMousePosition()
+    {
+        return mousePos;
     }
 }

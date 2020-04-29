@@ -2,6 +2,8 @@
 The GameObject is the basis for which all renderable things are built. A GameObject is anything that is rendered on screen and exists within the game space.
  */
 //Imports
+import DEBUGCONSOLE.DebugConsole;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -20,11 +22,24 @@ public abstract class GameObject extends JComponent
     {
         setLayout(null);
     }
+    private Position offset = new Position();
 
     protected void paintComponent(Graphics g) //Paint function
     {
         super.paintComponent(g);
-        g.drawImage(sprite, myPos.getX(), myPos.getY(), this);
+        g.drawImage(sprite, myPos.getX() - offset.x, myPos.getY() - offset.y, this);
+        //Draw circle on top of Sprite to show center
+        if(DebugConsole.SHOW_OBJECT_ORIGIN)
+        {
+            g.setColor(Color.ORANGE);
+            g.drawOval(myPos.getX(), myPos.getY(),4,4);
+        }
+        //Show Object Position
+        if(DebugConsole.SHOW_OBJECT_POSITION)
+        {
+            g.setColor(Color.BLACK);
+            g.drawString(myPos.toString(), myPos.x, myPos.y);
+        }
     }
 
     //Sets and gets
@@ -87,8 +102,8 @@ public abstract class GameObject extends JComponent
 
     public void ScaleSprite(double factor)
     {
-        int width = (int) (sprite.getWidth(this) * factor);
-        int height = (int) (sprite.getHeight(this) * factor);
+        int width = (int) Math.round(sprite.getWidth(this) * factor);
+        int height = (int) Math.round(sprite.getHeight(this) * factor);
         Image tmp = sprite.getScaledInstance(width, height, Image.SCALE_SMOOTH);
         BufferedImage resized = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = resized.createGraphics();
@@ -107,6 +122,20 @@ public abstract class GameObject extends JComponent
         {
             System.out.println("Reset failed");
         }
+    }
+
+    public String toString()
+    {
+        return myPos.toString() + "w: " + getSpriteSize().width + " h: " + getSpriteSize().height;
+    }
+
+    public boolean isEqual(GameObject g)
+    {
+        if(myPos == g.myPos && sprite == g.getSprite())
+        {
+            return true;
+        }
+        return false;
     }
 }
 

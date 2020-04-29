@@ -13,9 +13,15 @@ public class DebugConsole extends JFrame
     private JTextArea textField;
     private JTextArea viewArea;
     //Used to keep track of what commands are valid
-    private final String[] commands = {"!help", "!toggleColliders"};
+    private final String[] commands = {"!help", "!toggleColliders", "!toggleMouseCoors", "!showCenter", "!showPosition"};
+    private final String[] descriptions = {"Displays all commands", "Toggles Collider visuals",
+            "Toggle Mouse Coordinates", "Displays center of object", "Shows object Position"};
+
     //Static debug variables to enact changes
     public static boolean SHOW_COLLIDERS;
+    public static boolean SHOW_MOUSE_COORS;
+    public static boolean SHOW_OBJECT_ORIGIN;
+    public static boolean SHOW_OBJECT_POSITION;
 
 
     //FOR USE OF TESTING DEBUG LOG
@@ -113,7 +119,7 @@ public class DebugConsole extends JFrame
         textField.setText("");
     }
 
-    private void AddTextToView(String s)
+    public void AddTextToView(String s)
     {
         viewArea.setText(viewArea.getText() + '\n' + s);
     }
@@ -124,15 +130,30 @@ public class DebugConsole extends JFrame
         {
             case 0: //Help
                 AddTextToView("Available Commands: ");
-                for(String s: commands)
+                for(int i = 0; i < commands.length; i++)
                 {
-                    AddTextToView("    " + s);
+                    AddTextToView("    " + commands[i] + " - " + descriptions[i]);
                 }
                 break;
 
             case 1: //Toggle Colliders
                 SHOW_COLLIDERS = !SHOW_COLLIDERS;
                 AddTextToView("Colliders Visible = " + SHOW_COLLIDERS);
+                break;
+
+            case 2: //Mouse Coordinates
+                SHOW_MOUSE_COORS = !SHOW_MOUSE_COORS;
+                AddTextToView("Mouse Coors. = " + SHOW_MOUSE_COORS);
+                break;
+
+            case 3: //Object Origin
+                SHOW_OBJECT_ORIGIN = !SHOW_OBJECT_ORIGIN;
+                AddTextToView("Object Origin = " + SHOW_OBJECT_ORIGIN);
+                break;
+
+            case 4: //Object Position
+                SHOW_OBJECT_POSITION = !SHOW_OBJECT_POSITION;
+                AddTextToView("Object Position = " + SHOW_OBJECT_POSITION);
                 break;
         }
     }

@@ -1,3 +1,5 @@
+import DEBUGCONSOLE.DebugConsole;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.IOException;
@@ -10,17 +12,17 @@ public class TarotCard extends GameObject
 {
     //Variables
     private String arcana;
+    Collider myCol;
 
     public TarotCard(Position startPos, String n)
     {
         super();
+        setPosition(startPos);
         //Set initial sprite to back
         setSprite("/TarotDeck/Card_Back.jpg");
-        myPos = startPos;
         setPreferredSize(getSpriteSize());
         //Set other variables
         arcana = n;
-        repaint();
     }
 
     public void flip()

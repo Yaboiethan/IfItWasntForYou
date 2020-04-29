@@ -11,27 +11,34 @@ import DEBUGCONSOLE.DebugConsole;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.Rectangle2D;
 
 public class Player extends GameObject
 {
     //Variables
     public boolean isMoving;
-    private int speed = 2;
+    private static int speed = 2;
     char currentKey;
     Collider myCol;
     boolean mNorth = true;
     boolean mEast = true;
     boolean mSouth = true;
     boolean mWest = true;
+    //Collider storage
+    /*
+    0 == NORTH
+    1 == EAST
+    2 == SOUTH
+    3 == WEST
+     */
+    Collider[] touchedCols = new Collider[4];
 
     public Player(Position startingPos) //Fill constuctor
     {
         super();
+        setPosition(startingPos);
         //TEMP--Set player sprite
         setSprite("/TestPlayer.jpg");
         setPreferredSize(getSpriteSize());
-        setPosition(startingPos);
         myCol = new Collider(this);
     }
 
@@ -95,6 +102,36 @@ public class Player extends GameObject
         }
     }
 
+    public boolean getMovement(Position.Direction dir)
+    {
+        boolean toRet = false;
+        switch(dir)
+        {
+            case NORTH:
+                toRet = mNorth;
+                break;
+
+            case EAST:
+                toRet = mEast;
+                break;
+
+            case SOUTH:
+                toRet = mSouth;
+                break;
+
+            case WEST:
+                toRet = mWest;
+                break;
+
+        }
+        return toRet;
+    }
+
+    public static int getSpeed()
+    {
+        return speed;
+    }
+
     public Collider getCollider()
     {
         return myCol;
@@ -109,8 +146,79 @@ public class Player extends GameObject
         if(DebugConsole.SHOW_COLLIDERS)
         {
             g.setColor(Color.GREEN);
-            Rectangle2D rect = myCol.getColObject();
-            g.drawRect(((int) rect.getX()), ((int) rect.getY()),((int) rect.getWidth()), ((int) rect.getHeight()));
+            Graphics2D g2d = (Graphics2D) g;
+            g2d.draw(myCol.getColObject());
+            g2d.dispose();
+        }
+
+        //Mouse Coordinates
+        if(DebugConsole.SHOW_MOUSE_COORS)
+        {
+            g.setColor(Color.BLACK);
+            g.drawString(GUIManager.GetMousePosition().toString(), GUIManager.GetMousePosition().x, GUIManager.GetMousePosition().y + 2);
+        }
+    }
+
+    public void storeCollider(Position.Direction dir, Collider c)
+    {
+        switch(dir)
+        {
+            case NORTH:
+                touchedCols[0] = c;
+                break;
+
+            case EAST:
+                touchedCols[1] = c;
+                break;
+
+            case SOUTH:
+                touchedCols[2] = c;
+                break;
+
+            case WEST:
+                touchedCols[3] = c;
+                break;
+        }
+    }
+
+    public Collider getFromStorage(Position.Direction dir)
+    {
+        switch(dir)
+        {
+            case NORTH:
+                return touchedCols[0];
+
+            case EAST:
+                return touchedCols[1];
+
+            case SOUTH:
+                return touchedCols[2];
+
+            case WEST:
+                return touchedCols[3];
+        }
+        return null;
+    }
+
+    public void removeCollider(Position.Direction dir)
+    {
+        switch(dir)
+        {
+            case NORTH:
+                touchedCols[0] = null;
+                break;
+
+            case EAST:
+                touchedCols[1] = null;
+                break;
+
+            case SOUTH:
+                touchedCols[2] = null;
+                break;
+
+            case WEST:
+                touchedCols[3] = null;
+                break;
         }
     }
 }

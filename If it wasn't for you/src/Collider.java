@@ -19,59 +19,78 @@ public class Collider
         GUIManager.AddtoColliders(this);
     }
 
+    public Collider(Rectangle2D bounds) //Empty Collider--static, non viewable colliders
+    {
+        thisObj = null;
+        GUIManager.AddtoColliders(this);
+        col = bounds;
+    }
+
     /*
     Run this in the update method of each collider to check for collision within each of the colliders
     This method assumes the attached gameobject is a player object
      */
     public void UpdatePlayerCollider()
     {
-        setCollider();
         assert thisObj instanceof Player: "GameObject not of type: Player";
         //Should be able to successfully cast to player
         Player p = (Player) thisObj;
+        int offsetH = thisObj.getSpriteSize().height - Player.getSpeed();
+        int offsetW = (thisObj.getSpriteSize().width / 4) - Player.getSpeed();
+        setCollider();
         for(Collider c: GUIManager.GetColliders())
         {
-            if(col.intersects(c.getColObject()) && !isSame(c))
+            if(!isSame(c)) //Make sure the objects aren't the same object
             {
-                System.out.println("HIT");
-                break;
+                if(col.getBounds2D().intersects(c.getColObject().getBounds2D())) //Check if colliding
+                {
+                    if(getColObject().getMaxY() - offsetH == (c.getColObject().getMaxY() + 1)) //North
+                    {
+                        p.setMovement(false, Position.Direction.NORTH);
+                        p.storeCollider(Position.Direction.NORTH, c);
+                        break;
+                    }
+                    else if(getColObject().getMinY() + offsetH == (c.getColObject().getMinY())) //South
+                    {
+                        p.setMovement(false, Position.Direction.SOUTH);
+                        p.storeCollider(Position.Direction.SOUTH, c);
+                        break;
+                    }
+                    else if(getColObject().getMinX() + offsetW == (c.getColObject().getMaxX())) //West
+                    {
+                        p.setMovement(false, Position.Direction.WEST);
+                        p.storeCollider(Position.Direction.WEST, c);
+                        break;
+                    }
+                    else if(getColObject().getMaxX() - offsetW == (c.getColObject().getMinX() + 1)) //East
+                    {
+                        p.setMovement(false, Position.Direction.EAST);
+                        p.storeCollider(Position.Direction.EAST, c);
+                        break;
+                    }
+                }
             }
         }
-        //Map Bounds
-        if(thisObj.myPos.y + thisObj.getSpriteSize().height + 2 <= 18) //North
-        {
-            p.setMovement(false, Position.Direction.NORTH);
-        }
-        else
+        //Check if collisions need to be reset
+        if(p.getFromStorage(Position.Direction.NORTH) != null && !col.intersects(p.getFromStorage(Position.Direction.NORTH).getColObject()))
         {
             p.setMovement(true, Position.Direction.NORTH);
+            p.removeCollider(Position.Direction.NORTH);
         }
-
-        if(thisObj.myPos.y + thisObj.getSpriteSize().height + 2 >= 480) //South
-        {
-            p.setMovement(false, Position.Direction.SOUTH);
-        }
-        else
-        {
-            p.setMovement(true, Position.Direction.SOUTH);
-        }
-
-        if(thisObj.myPos.x + thisObj.getSpriteSize().width + 2 >= 490) //East
-        {
-            p.setMovement(false, Position.Direction.EAST);
-        }
-        else
+        if(p.getFromStorage(Position.Direction.EAST) != null && !col.intersects(p.getFromStorage(Position.Direction.EAST).getColObject()))
         {
             p.setMovement(true, Position.Direction.EAST);
+            p.removeCollider(Position.Direction.EAST);
         }
-
-        if(thisObj.myPos.x + thisObj.getSpriteSize().width + 2 <= 18) //West
+        if(p.getFromStorage(Position.Direction.SOUTH) != null && !col.intersects(p.getFromStorage(Position.Direction.SOUTH).getColObject()))
         {
-            p.setMovement(false, Position.Direction.WEST);
+            p.setMovement(true, Position.Direction.SOUTH);
+            p.removeCollider(Position.Direction.SOUTH);
         }
-        else
+        if(p.getFromStorage(Position.Direction.WEST) != null && !col.intersects(p.getFromStorage(Position.Direction.WEST).getColObject()))
         {
             p.setMovement(true, Position.Direction.WEST);
+            p.removeCollider(Position.Direction.WEST);
         }
     }
 
@@ -82,20 +101,40 @@ public class Collider
 
     private void setCollider()
     {
-        col.setRect(thisObj.myPos.x, thisObj.myPos.y, thisObj.getSpriteSize().width, thisObj.getSpriteSize().height);
+        if(thisObj != null)
+        {
+            col.setRect(thisObj.myPos.x - 1, thisObj.myPos.y - 1, thisObj.getSpriteSize().width + 1, thisObj.getSpriteSize().height + 1);
+        }
+    }
+
+    public void setSize(Rectangle2D rect)
+    {
+        col = rect;
     }
 
     public Rectangle2D getColObject()
     {
+        setCollider();
         return col;
     }
 
     public boolean isSame(Collider c)
     {
+        //Error, no GameObject attached
+        if(thisObj == null || c.thisObj == null)
+        {
+            return false;
+        }
+
         if(thisObj == c.thisObj)
         {
             return true;
         }
         return false;
+    }
+
+    public String toString()
+    {
+        return getColObject().getBounds2D().toString();
     }
 }
