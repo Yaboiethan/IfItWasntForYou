@@ -13,15 +13,17 @@ public class DebugConsole extends JFrame
     private JTextArea textField;
     private JTextArea viewArea;
     //Used to keep track of what commands are valid
-    private final String[] commands = {"!help", "!toggleColliders", "!toggleMouseCoors", "!showCenter", "!showPosition"};
+    private final String[] commands = {"!help", "!toggleColliders", "!toggleMouseCoors", "!showCenter",
+            "!togglePos", "!toggleAnim"};
     private final String[] descriptions = {"Displays all commands", "Toggles Collider visuals",
-            "Toggle Mouse Coordinates", "Displays center of object", "Shows object Position"};
+            "Toggle Mouse Coordinates", "Displays center of object", "Shows object Position", "Show object animation information"};
 
     //Static debug variables to enact changes
     public static boolean SHOW_COLLIDERS;
     public static boolean SHOW_MOUSE_COORS;
     public static boolean SHOW_OBJECT_ORIGIN;
     public static boolean SHOW_OBJECT_POSITION;
+    public static boolean SHOW_ANIMATOR_INFO;
 
 
     //FOR USE OF TESTING DEBUG LOG
@@ -154,6 +156,11 @@ public class DebugConsole extends JFrame
             case 4: //Object Position
                 SHOW_OBJECT_POSITION = !SHOW_OBJECT_POSITION;
                 AddTextToView("Object Position = " + SHOW_OBJECT_POSITION);
+                break;
+
+            case 5: //Animator Information
+                SHOW_ANIMATOR_INFO = !SHOW_ANIMATOR_INFO;
+                AddTextToView("Animator Info = " + SHOW_ANIMATOR_INFO);
                 break;
         }
     }

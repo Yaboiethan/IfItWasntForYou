@@ -48,7 +48,6 @@ public class GUIManager {
 
         //Add MarketCollider
         SceneObject testCollider = new SceneObject(new Position(100,100), "Market Tent");
-        testCollider.ScaleSprite(1.4);
         testCollider.myCol.UpdateCollider();
         playArea.add(testCollider);
         eGui.revalidate();

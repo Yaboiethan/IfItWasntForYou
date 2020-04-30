@@ -15,6 +15,7 @@ public class SceneObject extends GameObject
         setPosition(startingPos);
         setSprite("/StaticAssets/" + fileName + ".png");
         setPreferredSize(getSpriteSize());
+        ScaleSprite(1.4);
         myCol = new Collider(this);
     }
 

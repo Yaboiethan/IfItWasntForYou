@@ -18,11 +18,14 @@ public abstract class GameObject extends JComponent
     protected Position myPos;
     private Image sprite;
     private String ogImg;
+    private Position offset = new Position();
+    private double spriteScaleFactor = 1;
+
     public GameObject()
     {
         setLayout(null);
     }
-    private Position offset = new Position();
+
 
     protected void paintComponent(Graphics g) //Paint function
     {
@@ -49,6 +52,7 @@ public abstract class GameObject extends JComponent
         try
         {
             sprite = ImageIO.read(getClass().getResource(path));
+            ScaleSprite(spriteScaleFactor);
         }
         catch (IOException e)
         {
@@ -59,7 +63,22 @@ public abstract class GameObject extends JComponent
     public void setSprite(Image i)
     {
         sprite = i;
+        ScaleSprite(spriteScaleFactor);
     }
+
+    public Image getResource(String path)
+    {
+        try
+        {
+            return ImageIO.read(getClass().getResource(path));
+        }
+        catch (IOException e)
+        {
+            GUIManager.debugConsole.AddTextToView(e.toString());
+        }
+        return null;
+    }
+
 
     public Image getSprite()
     {
@@ -102,6 +121,10 @@ public abstract class GameObject extends JComponent
 
     public void ScaleSprite(double factor)
     {
+        //Set the variable
+        spriteScaleFactor = factor;
+
+        //Actual Math
         int width = (int) Math.round(sprite.getWidth(this) * factor);
         int height = (int) Math.round(sprite.getHeight(this) * factor);
         Image tmp = sprite.getScaledInstance(width, height, Image.SCALE_SMOOTH);

@@ -7,7 +7,8 @@ import java.awt.geom.Rectangle2D;
 public class Collider
 {
     Rectangle2D col = new Rectangle();
-    GameObject thisObj;
+    private GameObject thisObj;
+    private boolean init = false;
 
     public Collider(GameObject g)
     {
@@ -101,9 +102,18 @@ public class Collider
 
     private void setCollider()
     {
-        if(thisObj != null)
+        if(thisObj != null) //Make sure GameObject is filled
         {
-            col.setRect(thisObj.myPos.x - 1, thisObj.myPos.y - 1, thisObj.getSpriteSize().width + 1, thisObj.getSpriteSize().height + 1);
+            //Bounding box is based off of the first frame of animation
+            if(!init)
+            {
+                col.setRect(thisObj.myPos.x - 1, thisObj.myPos.y - 1, thisObj.getSpriteSize().getWidth() + 1, thisObj.getSpriteSize().height + 1);
+                init = true;
+            }
+            else
+            {
+                col.setRect(thisObj.myPos.x - 1, thisObj.myPos.y - 1, col.getWidth(), col.getHeight());
+            }
         }
     }
 
