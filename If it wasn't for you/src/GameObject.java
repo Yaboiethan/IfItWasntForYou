@@ -66,11 +66,11 @@ public abstract class GameObject extends JComponent
         ScaleSprite(spriteScaleFactor);
     }
 
-    public Image getResource(String path)
+    public static Image getResource(String path)
     {
         try
         {
-            return ImageIO.read(getClass().getResource(path));
+            return ImageIO.read(GameObject.class.getResource(path));
         }
         catch (IOException e)
         {

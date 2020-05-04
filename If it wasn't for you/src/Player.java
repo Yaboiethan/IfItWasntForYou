@@ -48,57 +48,33 @@ public class Player extends GameObject
 
     public void InitializeAnimator()
     {
-        String resourcePath = "/Placeholder/Player/";
+        String resourcePath = "/Placeholder/Player/Player_";
         //Initialize Object
         anim = new Animator(this, "Player");
-        //Anim 0-- IDLE
-        Animation idleS = new Animation(1, "Idle_S", 0);
-        idleS.setFrame(getResource(resourcePath + anim.GetName()+ "_Walking_S_0.png"), 0);
-        anim.AddAnimation(idleS);
+
+        //Anim 0-- IDLE SOUTH
+        anim.BuildAnimation("Idle_S", getResource(resourcePath + "Walking_S_0.png"), 0);
+
         //Anim 1-- WALKING SOUTH
-        Animation walkingS = new Animation(4, "Walking_S", 1.1);
-        //For loop to set up the frames
-        walkingS.setFrame(getResource(resourcePath + anim.GetName() + "_" + walkingS.getName() + "_1.png"), 0);
-        walkingS.setFrame(getResource(resourcePath + anim.GetName() + "_" + walkingS.getName() + "_0.png"), 1);
-        walkingS.setFrame(getResource(resourcePath + anim.GetName() + "_" + walkingS.getName() + "_2.png"), 2);
-        walkingS.setFrame(getResource(resourcePath + anim.GetName() + "_" + walkingS.getName() + "_0.png"), 3);
-        anim.AddAnimation(walkingS);
+        anim.BuildAnimation("Walking_S", resourcePath, new int[] {1,0,2,0}, 1.1);
+
         //Anim 2-- IDLE NORTH
-        Animation idleN = new Animation(1, "Idle_N", 0);
-        idleN.setFrame(getResource(resourcePath + anim.GetName() + "_Walking_N_0.png"), 0);
-        anim.AddAnimation(idleN);
+        anim.BuildAnimation("Idle_N", getResource(resourcePath + "Walking_N_0.png"), 0);
+
         //Anim 3-- WALKING NORTH
-        Animation walkingN = new Animation(4, "Walking_N", 1.1);
-        //For loop to set up the frames
-        walkingN.setFrame(getResource(resourcePath + anim.GetName() + "_" + walkingN.getName() + "_1.png"), 0);
-        walkingN.setFrame(getResource(resourcePath + anim.GetName() + "_" + walkingN.getName() + "_0.png"), 1);
-        walkingN.setFrame(getResource(resourcePath + anim.GetName() + "_" + walkingN.getName() + "_2.png"), 2);
-        walkingN.setFrame(getResource(resourcePath + anim.GetName() + "_" + walkingN.getName() + "_0.png"), 3);
-        anim.AddAnimation(walkingN);
+        anim.BuildAnimation("Walking_N", resourcePath, new int[] {1,0,2,0}, 1.1);
+
         //Anim 4-- IDLE EAST
-        Animation idleE = new Animation(1, "Idle_E", 0);
-        idleE.setFrame(getResource(resourcePath + anim.GetName() + "_Walking_E_0.png"), 0);
-        anim.AddAnimation(idleE);
+        anim.BuildAnimation("Idle_E", getResource(resourcePath + "Walking_E_0.png"), 0);
+
         //Anim 5- WALKING EAST
-        Animation walkingE = new Animation(4, "Walking_E", 1.1);
-        //For loop to set up the frames
-        walkingE.setFrame(getResource(resourcePath + anim.GetName() + "_" + walkingE.getName() + "_1.png"), 0);
-        walkingE.setFrame(getResource(resourcePath + anim.GetName() + "_" + walkingE.getName() + "_0.png"), 1);
-        walkingE.setFrame(getResource(resourcePath + anim.GetName() + "_" + walkingE.getName() + "_2.png"), 2);
-        walkingE.setFrame(getResource(resourcePath + anim.GetName() + "_" + walkingE.getName() + "_0.png"), 3);
-        anim.AddAnimation(walkingE);
+        anim.BuildAnimation("Walking_E", resourcePath, new int[] {1,0,2,0}, 1.1);
+
         //Anim 6-- IDLE WEST
-        Animation idleW = new Animation(1, "Idle_W", 0);
-        idleW.setFrame(getResource(resourcePath + anim.GetName() + "_Walking_W_0.png"), 0);
-        anim.AddAnimation(idleW);
+        anim.BuildAnimation("Idle_E", getResource(resourcePath + "Walking_W_0.png"), 0);
+
         //Anim 7- WALKING WEST
-        Animation walkingW = new Animation(4, "Walking_W", 1.1);
-        //For loop to set up the frames
-        walkingW.setFrame(getResource(resourcePath + anim.GetName() + "_" + walkingW.getName() + "_1.png"), 0);
-        walkingW.setFrame(getResource(resourcePath + anim.GetName() + "_" + walkingW.getName() + "_0.png"), 1);
-        walkingW.setFrame(getResource(resourcePath + anim.GetName() + "_" + walkingW.getName() + "_2.png"), 2);
-        walkingW.setFrame(getResource(resourcePath + anim.GetName() + "_" + walkingW.getName() + "_0.png"), 3);
-        anim.AddAnimation(walkingW);
+        anim.BuildAnimation("Walking_W", resourcePath, new int[] {1,0,2,0}, 1.1);
 
         //Set the first frame of the object
         setSprite(anim.getCurAnim().getFrame(0));

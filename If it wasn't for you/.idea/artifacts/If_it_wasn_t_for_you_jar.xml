@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="If it wasn't for you:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/If_it_wasn_t_for_you_jar</output-path>
+    <root id="archive" name="If it wasn't for you.jar">
+      <element id="module-output" name="If it wasn't for you" />
+    </root>
+  </artifact>
+</component>

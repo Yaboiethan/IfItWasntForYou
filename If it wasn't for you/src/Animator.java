@@ -54,6 +54,25 @@ public class Animator
         return name +  "  " + getCurAnim().getName() + ":  Frame " + curFrame + "/" + anims.get(curAnim).getSize();
     }
 
+    public void BuildAnimation(String name, String filePrefix, int[] frameOrder, double cooldown) //Multi-Frame animation
+    {
+        String finalFilePrefix = filePrefix + name + "_";
+        Animation thisAnim = new Animation(frameOrder.length, name, cooldown);
+        //Add frames according to frameOrder
+        for(int i = 0; i < frameOrder.length; i++)
+        {
+            thisAnim.setFrame(GameObject.getResource(finalFilePrefix + frameOrder[i] + ".png"), i);
+        }
+        this.AddAnimation(thisAnim); //Add to this animator
+    }
+
+    public void BuildAnimation(String name, Image baseImg, double cooldown) //Creates single frame animation
+    {
+        Animation thisAnim = new Animation(1, name, cooldown);
+        thisAnim.setFrame(baseImg, 0);
+        this.AddAnimation(thisAnim);
+    }
+
     public void SetCurrentAnimation(String n)
     {
         for(int i = 0; i < anims.size(); i++)
