@@ -4,6 +4,7 @@ Sceneobjects are static, non-moving assets that serve mainly as setpieces in the
 import DEBUGCONSOLE.DebugConsole;
 
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 
 public class SceneObject extends GameObject
 {
@@ -16,6 +17,7 @@ public class SceneObject extends GameObject
         setSprite("/StaticAssets/" + fileName + ".png");
         setPreferredSize(getSpriteSize());
         ScaleSprite(1.4);
+        //Create the trigger
         myCol = new Collider(this);
     }
 

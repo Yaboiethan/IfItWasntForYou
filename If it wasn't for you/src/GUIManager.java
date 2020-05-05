@@ -13,9 +13,12 @@ public class GUIManager {
     static JPanel playArea = new JPanel();
     static Player player;
     private static TarotDeck deck;
+    //ArrayLists for updating
     private static ArrayList<Collider> colliders = new ArrayList<>();
-    public static DebugConsole debugConsole = new DebugConsole();
+    private static ArrayList<NPC> npcs = new ArrayList<>();
+
     //Debug Variables
+    public static DebugConsole debugConsole = new DebugConsole();
     private static Position mousePos = new Position(0,0);
 
     public static void main(String[] args)
@@ -42,14 +45,20 @@ public class GUIManager {
 
         //Add the first card
         TarotCard testCard = deck.GetCard(0);
-        testCard.setPosition(150, 230);
+        testCard.setPosition(150, 280);
         playArea.add(testCard);
         testCard.flip();
 
         //Add MarketCollider
         SceneObject testCollider = new SceneObject(new Position(100,100), "Market Tent");
-        testCollider.myCol.UpdateCollider();
+        //testCollider.myCol.UpdateCollider();
         playArea.add(testCollider);
+        eGui.revalidate();
+
+        //Add TestNPC
+        NPC testGirl = new NPC(new Position(150,200));
+        playArea.add(testGirl);
+        npcs.add(testGirl); //Add to array
         eGui.revalidate();
 
         //Add the player
@@ -94,15 +103,24 @@ public class GUIManager {
     }
 
     private static void GameUpdate() {
-        while (eGui.isVisible()) {
-            //Update debug variables
+        while (eGui.isVisible())
+        {
             //Player Update
             player.Update();
 
+            //Update NPCS
+            for(NPC e: npcs)
+            {
+                e.Update();
+            }
+
             //Sleep to slow things down a bit
-            try {
+            try
+            {
                 Thread.sleep(1000L / 60L);
-            } catch (InterruptedException e) {
+            }
+            catch (InterruptedException e)
+            {
                 System.out.println("Interruption Exception");
             }
         }

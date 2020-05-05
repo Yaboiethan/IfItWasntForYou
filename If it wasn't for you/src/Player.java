@@ -48,7 +48,7 @@ public class Player extends GameObject
 
     public void InitializeAnimator()
     {
-        String resourcePath = "/Placeholder/Player/Player_";
+        String resourcePath = "/Sprites/Player/Player_";
         //Initialize Object
         anim = new Animator(this, "Player");
 
@@ -71,7 +71,7 @@ public class Player extends GameObject
         anim.BuildAnimation("Walking_E", resourcePath, new int[] {1,0,2,0}, 1.1);
 
         //Anim 6-- IDLE WEST
-        anim.BuildAnimation("Idle_E", getResource(resourcePath + "Walking_W_0.png"), 0);
+        anim.BuildAnimation("Idle_W", getResource(resourcePath + "Walking_W_0.png"), 0);
 
         //Anim 7- WALKING WEST
         anim.BuildAnimation("Walking_W", resourcePath, new int[] {1,0,2,0}, 1.1);
