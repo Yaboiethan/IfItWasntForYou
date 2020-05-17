@@ -1,5 +1,3 @@
-import DEBUGCONSOLE.DebugConsole;
-
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.IOException;
@@ -12,7 +10,6 @@ public class TarotCard extends GameObject
 {
     //Variables
     private String arcana;
-    Collider myCol;
 
     public TarotCard(Position startPos, String n)
     {
@@ -34,7 +31,12 @@ public class TarotCard extends GameObject
         }
         catch (IOException e)
         {
-            System.out.println("Attempt to load " + arcana + " card failed.");
+            GUIManager.debugConsole.AddTextToView("Attempt to load " + arcana + " card failed.");
         }
+    }
+
+    public String toString()
+    {
+        return arcana;
     }
 }

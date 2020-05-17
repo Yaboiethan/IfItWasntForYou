@@ -14,13 +14,13 @@ public class Collider
         //Set up collider size
         setCollider();
         //Add collider to GUIManager colliders list
-        GUIManager.AddtoColliders(this);
+        GUIManager.addtoColliders(this);
     }
 
     public Collider(Rectangle2D bounds) //Empty Collider--static, non viewable colliders
     {
         thisObj = null;
-        GUIManager.AddtoColliders(this);
+        GUIManager.addtoColliders(this);
         col = bounds;
     }
 
@@ -34,14 +34,14 @@ public class Collider
         //Should be able to successfully cast to player
         Player p = (Player) thisObj;
         setCollider();
-        for(Collider c: GUIManager.GetColliders())
+        for(Collider c: GUIManager.getColliders())
         {
             if(!isSame(c)) //Make sure the objects aren't the same object
             {
                 if(col.getBounds2D().intersects(c.getColObject().getBounds2D())) //Check if colliding
                 {
                     CollisionEnter(c);
-                    c.CollisionEnter();
+                    c.CollisionEnter(thisObj);
                 }
             }
         }
@@ -78,30 +78,43 @@ public class Collider
     {
         int offsetH = thisObj.getSpriteSize().height - Player.getSpeed();
         int offsetW = (thisObj.getSpriteSize().width / 4) - Player.getSpeed();
+        boolean isTrigger = c instanceof TriggerCollider; //Make sure movement isn't stopped by TriggerColliders
         Player p = (Player) thisObj;
         if(getColObject().getMaxY() - offsetH == (c.getColObject().getMaxY() + 1)) //North
         {
-            p.setMovement(false, Position.Direction.NORTH);
+            if(!isTrigger)
+            {
+                p.setMovement(false, Position.Direction.NORTH);
+            }
             p.storeCollider(Position.Direction.NORTH, c);
         }
         else if(getColObject().getMinY() + offsetH == (c.getColObject().getMinY())) //South
         {
-            p.setMovement(false, Position.Direction.SOUTH);
+            if(!isTrigger)
+            {
+                p.setMovement(false, Position.Direction.SOUTH);
+            }
             p.storeCollider(Position.Direction.SOUTH, c);
         }
         else if(getColObject().getMinX() + offsetW == (c.getColObject().getMaxX())) //West
         {
-            p.setMovement(false, Position.Direction.WEST);
+            if(!isTrigger)
+            {
+                p.setMovement(false, Position.Direction.WEST);
+            }
             p.storeCollider(Position.Direction.WEST, c);
         }
         else if(getColObject().getMaxX() - offsetW == (c.getColObject().getMinX() + 1)) //East
         {
-            p.setMovement(false, Position.Direction.EAST);
+            if(!isTrigger)
+            {
+                p.setMovement(false, Position.Direction.EAST);
+            }
             p.storeCollider(Position.Direction.EAST, c);
         }
     }
 
-    void CollisionEnter() //Empty method for overriding
+    void CollisionEnter(GameObject other) //Empty method for overriding
     {
 
     }

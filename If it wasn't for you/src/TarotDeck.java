@@ -35,7 +35,7 @@ public class TarotDeck
         }
         catch (ArrayIndexOutOfBoundsException e)
         {
-            System.out.println("Out of bounds");
+            GUIManager.debugConsole.AddTextToView("Tarot Deck out of bounds");
         }
         return null;
     }
@@ -46,15 +46,35 @@ public class TarotDeck
         return cards.get(rand.nextInt(cards.size()));
     }
 
+    public TarotCard[] GetFirstThree()
+    {
+        TarotCard[] retC = new TarotCard[3];
+        for(int i = 0; i < 3; i++)
+        {
+            retC[i] = cards.get(i);
+        }
+        return retC;
+    }
+
     public void Shuffle()
     {
         Random rand = new Random();
-        for(TarotCard card: cards)
+        for(int i = 0; i < cards.size(); i++)
         {
             int toReplace = rand.nextInt(cards.size());
             TarotCard temp = cards.get(toReplace);
-            cards.set(toReplace, card);
-            card = temp;
+            cards.set(toReplace, cards.get(i));
+            cards.set(i,temp);
         }
+    }
+
+    public String toString()
+    {
+        String toRet = "";
+        for(int i = 0; i < cards.size(); i++)
+        {
+            toRet += i + ") " + cards.get(i).toString() + '\n';
+        }
+        return toRet;
     }
 }

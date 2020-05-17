@@ -1,7 +1,4 @@
-package DEBUGCONSOLE;
-
 import javax.swing.*;
-import javax.swing.text.View;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -14,9 +11,10 @@ public class DebugConsole extends JFrame
     private JTextArea viewArea;
     //Used to keep track of what commands are valid
     private final String[] commands = {"!help", "!toggleColliders", "!toggleMouseCoors", "!showCenter",
-            "!togglePos", "!toggleAnim"};
+            "!togglePos", "!toggleAnim", "!showTarotDeck", "!moveNPC"};
     private final String[] descriptions = {"Displays all commands", "Toggles Collider visuals",
-            "Toggle Mouse Coordinates", "Displays center of object", "Shows object Position", "Show object animation information"};
+            "Toggle Mouse Coordinates", "Displays center of object", "Shows object Position",
+            "Show object animation information", "Displays order of Tarot Cards", "Moves npc to specified point"};
 
     //Static debug variables to enact changes
     public static boolean SHOW_COLLIDERS;
@@ -30,6 +28,7 @@ public class DebugConsole extends JFrame
     public static void main(String[] args)
     {
         DebugConsole TestDb = new DebugConsole();
+        TestDb.setVisible(true);
         TestDb.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
@@ -45,21 +44,15 @@ public class DebugConsole extends JFrame
         setSize(300,300);
         setResizable(false);
 
-        //Set up the JScrollPanel
-        JScrollPane scrollPane = new JScrollPane();
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        add(scrollPane);
-
         //Set up the JPanel
         JPanel mainArea = new JPanel();
         mainArea.setLayout(new BorderLayout());
         mainArea.setSize(300,300);
         mainArea.setBackground(Color.BLACK);
-        scrollPane.setViewportView(mainArea);
+        add(mainArea);
 
         //Set up the textArea
         textField = new JTextArea();
-        textField.setBorder(BorderFactory.createCompoundBorder());
         textField.setBackground(Color.DARK_GRAY);
         textField.setForeground(Color.GREEN);
         textField.setPreferredSize(new Dimension(300,50));
@@ -68,18 +61,19 @@ public class DebugConsole extends JFrame
 
         //Set up display area
         JScrollPane northPane = new JScrollPane();
-        northPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        northPane.getViewport().setMinimumSize(new Dimension(300,200));
+        northPane.getViewport().setPreferredSize(new Dimension(300, 200));
+        northPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        northPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         mainArea.add(northPane, BorderLayout.NORTH);
 
         viewArea = new JTextArea();
-        viewArea.setPreferredSize(new Dimension(300,200));
         viewArea.setEditable(false);
         viewArea.setBackground(Color.BLACK);
         viewArea.setForeground(Color.GREEN);
         //Set up initial text
         viewArea.setText("Welcome to the debug console, type a command: \n  Type '!help' to view commands");
         northPane.setViewportView(viewArea);
-
 
         //Set up the enter command thing
         textField.addKeyListener(new KeyAdapter() {
@@ -90,15 +84,16 @@ public class DebugConsole extends JFrame
                 if(key == KeyEvent.VK_ENTER)
                 {
                     AddToViewArea(textField.getText());
+                    textField.setText("");
                 }
             }
         });
-
         revalidate();
     }
 
     private void AddToViewArea(String s)
     {
+        s = s.replaceAll("\n", "");
         int coFound = -1;
         //Check if invalid command
         for(int i = 0; i < commands.length; i++)
@@ -118,7 +113,6 @@ public class DebugConsole extends JFrame
         {
             AddTextToView("INVALID COMMAND");
         }
-        textField.setText("");
     }
 
     public void AddTextToView(String s)
@@ -161,6 +155,32 @@ public class DebugConsole extends JFrame
             case 5: //Animator Information
                 SHOW_ANIMATOR_INFO = !SHOW_ANIMATOR_INFO;
                 AddTextToView("Animator Info = " + SHOW_ANIMATOR_INFO);
+                break;
+
+            case 6: //Tarot deck
+                AddTextToView(GUIManager.getDeck().toString());
+                break;
+
+            case 7: //Move NPC
+                //Get index first
+                int toGet = Integer.parseInt(JOptionPane.showInputDialog("Enter NPC Index"));
+                //Check if exists
+                if(GUIManager.getNpcs().size() < toGet)
+                {
+                    int posX = Integer.parseInt(JOptionPane.showInputDialog("Enter X location"));
+                    int posY = Integer.parseInt(JOptionPane.showInputDialog("Enter Y Location"));
+                    //Error check
+                    if(posX < 0 || posX > 500 || posY < 0 || posY > 500) //TODO Replace with scaled dimensions
+                    {
+                        AddTextToView("Coordinates entered out of bounds");
+                        return;
+                    }
+                    GUIManager.getNpcs().get(toGet).moveTo(new Position(posX, posY));
+                }
+                else
+                {
+                    AddTextToView("NPC at " + toGet + " does not exist.");
+                }
                 break;
         }
     }

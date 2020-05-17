@@ -28,7 +28,7 @@ public class Animator
         {
             if (timer >= anims.get(curAnim).getCoolDown()) //Switch to next frame
             {
-                obj.setSprite(GetNextFrame());
+                obj.setSprite(getNextFrame());
                 timer = 0; //Reset
             }
             else
@@ -39,12 +39,12 @@ public class Animator
     }
 
     //Gets
-    public GameObject GetObject()
+    public GameObject getObject()
     {
         return obj;
     }
 
-    public String GetName()
+    public String getName()
     {
         return name;
     }
@@ -54,7 +54,7 @@ public class Animator
         return name +  "  " + getCurAnim().getName() + ":  Frame " + curFrame + "/" + anims.get(curAnim).getSize();
     }
 
-    public void BuildAnimation(String name, String filePrefix, int[] frameOrder, double cooldown) //Multi-Frame animation
+    public void buildAnimation(String name, String filePrefix, int[] frameOrder, double cooldown) //Multi-Frame animation
     {
         String finalFilePrefix = filePrefix + name + "_";
         Animation thisAnim = new Animation(frameOrder.length, name, cooldown);
@@ -63,19 +63,19 @@ public class Animator
         {
             thisAnim.setFrame(GameObject.getResource(finalFilePrefix + frameOrder[i] + ".png"), i);
         }
-        this.AddAnimation(thisAnim); //Add to this animator
+        this.addAnimation(thisAnim); //Add to this animator
     }
 
-    public void BuildAnimation(String name, Image baseImg, double cooldown) //Creates single frame animation
+    public void buildAnimation(String name, Image baseImg, double cooldown) //Creates single frame animation
     {
         Animation thisAnim = new Animation(1, name, cooldown);
         thisAnim.setFrame(baseImg, 0);
-        this.AddAnimation(thisAnim);
+        this.addAnimation(thisAnim);
     }
 
-    public void SetCurrentAnimation(String n)
+    public void setCurrentAnimation(String n)
     {
-        for(int i = 0; i < anims.size(); i++)
+        for(int i = 0; i < anims.size(); i++) //Find anim with this string
         {
             if(anims.get(i).getName().equals(n))
             {
@@ -94,7 +94,7 @@ public class Animator
         }
     }
 
-    public Image GetNextFrame()
+    private Image getNextFrame()
     {
         if(curFrame >= anims.get(curAnim).getSize() - 1) //Reset animation
         {
@@ -113,7 +113,7 @@ public class Animator
     }
 
     //Practical Functions
-    public void AddAnimation(Animation a) //Add a pre-made Animation
+    public void addAnimation(Animation a) //Add a pre-made Animation
     {
         anims.add(a);
     }

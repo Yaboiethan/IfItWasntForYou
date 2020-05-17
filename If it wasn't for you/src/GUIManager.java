@@ -1,18 +1,17 @@
-import DEBUGCONSOLE.DebugConsole;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
 public class GUIManager {
     //Frame variables
     static JFrame eGui = new JFrame();
     public static final Dimension defaultSize = new Dimension(500, 500);
-    static JPanel playArea = new JPanel();
-    static Player player;
+    static JLayeredPane playArea = new JLayeredPane();
+    public static Player player;
     private static TarotDeck deck;
+    public static UIManager uiManager;
+
     //ArrayLists for updating
     private static ArrayList<Collider> colliders = new ArrayList<>();
     private static ArrayList<NPC> npcs = new ArrayList<>();
@@ -28,21 +27,25 @@ public class GUIManager {
         Initialize();
     }
 
-    private static void Initialize() {
+    private static void Initialize()
+    {
         //Set up the window basics
         eGui.setTitle("If it wasn't for you");
         eGui.setSize(500, 500);
         eGui.setResizable(false);
         eGui.setDefaultCloseOperation(eGui.EXIT_ON_CLOSE);
 
+        //Set up the UI Layer
+        uiManager = new UIManager(eGui);
+        eGui.add(uiManager);
+
         //Set up the play area
-        eGui.add(playArea);
         playArea.setPreferredSize(new Dimension(500, 500));
         playArea.setLayout(new BorderLayout());
         playArea.setBorder(BorderFactory.createTitledBorder("Play Area"));
         //Enable window
+        eGui.add(playArea);
         eGui.setVisible(true);
-
         //Add the first card
         TarotCard testCard = deck.GetCard(0);
         testCard.setPosition(150, 280);
@@ -105,6 +108,9 @@ public class GUIManager {
     private static void GameUpdate() {
         while (eGui.isVisible())
         {
+            //UIManager Update
+            uiManager.Update();
+
             //Player Update
             player.Update();
 
@@ -126,23 +132,45 @@ public class GUIManager {
         }
     }
 
-    public void AddComponentToScreen(GameObject j) {
+    public void addComponentToScreen(GameObject j) {
         eGui.add(j);
         eGui.revalidate();
     }
 
-    public static void AddtoColliders(Collider c)
+    public static void addtoColliders(Collider c)
     {
         colliders.add(c);
     }
 
-    public static ArrayList<Collider> GetColliders()
+    public static ArrayList<Collider> getColliders()
     {
         return colliders;
     }
 
-    public static Position GetMousePosition()
+    public static Position getMousePosition()
     {
         return mousePos;
+    }
+
+    public static boolean pointIntersectsCollider(Position pos)
+    {
+        boolean flag = false;
+        for(Collider c: colliders)
+        {
+            if(!(c instanceof TriggerCollider) && c.col.contains(pos.x, pos.y))
+            {
+                flag = true;
+            }
+        }
+        return flag;
+    }
+
+    public static ArrayList<NPC> getNpcs()
+    {
+        return npcs;
+    }
+
+    public static TarotDeck getDeck() {
+        return deck;
     }
 }

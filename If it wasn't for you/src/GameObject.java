@@ -2,7 +2,6 @@
 The GameObject is the basis for which all renderable things are built. A GameObject is anything that is rendered on screen and exists within the game space.
  */
 //Imports
-import DEBUGCONSOLE.DebugConsole;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -56,7 +55,7 @@ public abstract class GameObject extends JComponent
         }
         catch (IOException e)
         {
-            System.out.println("Loading image " + path + " has failed");
+            GUIManager.debugConsole.AddTextToView("Image load failed: " + path);
         }
     }
 
@@ -66,6 +65,9 @@ public abstract class GameObject extends JComponent
         ScaleSprite(spriteScaleFactor);
     }
 
+    /*
+    All image resources use this file format: 'resources/Sprites/<Type>/<Type>_<Animation>_<Direction>_<Frame #>.png'
+     */
     public static Image getResource(String path)
     {
         try
@@ -104,6 +106,11 @@ public abstract class GameObject extends JComponent
     public Position getPosition()
     {
         return myPos;
+    }
+
+    public UIManager getUIManager()
+    {
+        return GUIManager.uiManager;
     }
 
     //Sprite Alterations
@@ -206,5 +213,72 @@ class Position
     public String toString()
     {
         return "( " + x + ", " + y + " )";
+    }
+
+    public boolean equals(Position other)
+    {
+        boolean ret = false;
+        if(x == other.x && y == other.y)
+        {
+            ret = true;
+        }
+        return ret;
+    }
+
+    public static Direction getOppositeDirection(Direction dir)
+    {
+        switch (dir)
+        {
+            case NORTH:
+                return Direction.SOUTH;
+
+            case SOUTH:
+                return Direction.NORTH;
+
+            case EAST:
+                return Direction.WEST;
+
+            case WEST:
+                return Direction.EAST;
+        }
+        return null; //Something went wrong
+    }
+
+    public static Direction getOppositeDirection(char dir)
+    {
+        switch (dir)
+        {
+            case 'S':
+                return Direction.SOUTH;
+
+            case 'W':
+                return Direction.NORTH;
+
+            case 'A':
+                return Direction.WEST;
+
+            case 'D':
+                return Direction.EAST;
+        }
+        return null; //Something went wrong
+    }
+
+    public static char getDirectionAbbrev(Direction dir)
+    {
+        switch (dir)
+        {
+            case NORTH:
+                return 'N';
+
+            case SOUTH:
+                return 'S';
+
+            case EAST:
+                return 'E';
+
+            case WEST:
+                return 'W';
+        }
+        return '\u0000'; //Something went wrong
     }
 }

@@ -1,0 +1,3 @@
+If you're seeing this message...
+something went terribly wrong.
+Did you forget to call loadTextFile(String fileName)?

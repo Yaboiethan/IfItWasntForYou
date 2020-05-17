@@ -7,19 +7,14 @@ The Player class is the vessel of the player's inputs, and respond directly to w
     - Collision
  */
 
-import DEBUGCONSOLE.DebugConsole;
-
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.io.IOException;
-import java.util.Objects;
 
 public class Player extends GameObject
 {
     //Variables
     public boolean isMoving;
     private static int speed = 2;
-    private char currentKey;
+    private static char currentKey;
     private Collider myCol;
     private boolean mNorth = true;
     private boolean mEast = true;
@@ -53,32 +48,31 @@ public class Player extends GameObject
         anim = new Animator(this, "Player");
 
         //Anim 0-- IDLE SOUTH
-        anim.BuildAnimation("Idle_S", getResource(resourcePath + "Walking_S_0.png"), 0);
+        anim.buildAnimation("Idle_S", getResource(resourcePath + "Walking_S_0.png"), 0);
 
         //Anim 1-- WALKING SOUTH
-        anim.BuildAnimation("Walking_S", resourcePath, new int[] {1,0,2,0}, 1.1);
+        anim.buildAnimation("Walking_S", resourcePath, new int[] {1,0,2,0}, 1.1);
 
         //Anim 2-- IDLE NORTH
-        anim.BuildAnimation("Idle_N", getResource(resourcePath + "Walking_N_0.png"), 0);
+        anim.buildAnimation("Idle_N", getResource(resourcePath + "Walking_N_0.png"), 0);
 
         //Anim 3-- WALKING NORTH
-        anim.BuildAnimation("Walking_N", resourcePath, new int[] {1,0,2,0}, 1.1);
+        anim.buildAnimation("Walking_N", resourcePath, new int[] {1,0,2,0}, 1.1);
 
         //Anim 4-- IDLE EAST
-        anim.BuildAnimation("Idle_E", getResource(resourcePath + "Walking_E_0.png"), 0);
+        anim.buildAnimation("Idle_E", getResource(resourcePath + "Walking_E_0.png"), 0);
 
         //Anim 5- WALKING EAST
-        anim.BuildAnimation("Walking_E", resourcePath, new int[] {1,0,2,0}, 1.1);
+        anim.buildAnimation("Walking_E", resourcePath, new int[] {1,0,2,0}, 1.1);
 
         //Anim 6-- IDLE WEST
-        anim.BuildAnimation("Idle_W", getResource(resourcePath + "Walking_W_0.png"), 0);
+        anim.buildAnimation("Idle_W", getResource(resourcePath + "Walking_W_0.png"), 0);
 
         //Anim 7- WALKING WEST
-        anim.BuildAnimation("Walking_W", resourcePath, new int[] {1,0,2,0}, 1.1);
+        anim.buildAnimation("Walking_W", resourcePath, new int[] {1,0,2,0}, 1.1);
 
         //Set the first frame of the object
         setSprite(anim.getCurAnim().getFrame(0));
-        anim.SetCurrentAnimation("Idle");
     }
 
     public void Update()
@@ -120,47 +114,59 @@ public class Player extends GameObject
         //Animation Stuff
         switch(key)
         {
-            case 'w':
-                if(isMoving)
+            case 'w': //North
+                if(mNorth)
                 {
-                    anim.SetCurrentAnimation("Walking_N");
-                }
-                else
-                {
-                    anim.SetCurrentAnimation("Idle_N");
-                }
-                break;
-
-            case 'a':
-                if(isMoving)
-                {
-                    anim.SetCurrentAnimation("Walking_W");
-                }
-                else
-                {
-                    anim.SetCurrentAnimation("Idle_W");
+                    if(isMoving)
+                    {
+                        anim.setCurrentAnimation("Walking_N");
+                    }
+                    else
+                    {
+                        anim.setCurrentAnimation("Idle_N");
+                    }
                 }
                 break;
 
-            case 's':
-                if(isMoving)
+            case 'a': //West
+                if(mWest)
                 {
-                    anim.SetCurrentAnimation("Walking_S");
-                }
-                else
-                {
-                    anim.SetCurrentAnimation("Idle_S");
+                    if(isMoving)
+                    {
+                        anim.setCurrentAnimation("Walking_W");
+                    }
+                    else
+                    {
+                        anim.setCurrentAnimation("Idle_W");
+                    }
                 }
                 break;
 
-            case 'd':
-                if(isMoving)
+            case 's': //South
+                if(mSouth)
                 {
-                    anim.SetCurrentAnimation("Walking_E");
+                    if(isMoving)
+                    {
+                        anim.setCurrentAnimation("Walking_S");
+                    }
+                    else
+                    {
+                        anim.setCurrentAnimation("Idle_S");
+                    }
                 }
-                else
+                break;
+
+            case 'd': //East
+                if(mEast)
                 {
-                    anim.SetCurrentAnimation("Idle_E");
+                    if(isMoving)
+                    {
+                        anim.setCurrentAnimation("Walking_E");
+                    }
+                    else
+                    {
+                        anim.setCurrentAnimation("Idle_E");
+                    }
                 }
                 break;
         }
@@ -189,6 +195,20 @@ public class Player extends GameObject
         }
     }
 
+    public void setMovement(boolean b) //Used to disable/enable all movement at once (IE: Textbox)
+    {
+        mNorth = b;
+        mEast = b;
+        mSouth = b;
+        mWest = b;
+        //Check if false for animation correction
+        if(!b)
+        {
+            String animName = "Idle_" + getDirection().toString().substring(0,1);
+            anim.setCurrentAnimation(animName);
+        }
+    }
+
     public static int getSpeed()
     {
         return speed;
@@ -197,6 +217,38 @@ public class Player extends GameObject
     public Collider getCollider()
     {
         return myCol;
+    }
+
+    public Position.Direction getDirection()
+    {
+        String editedName = anim.getCurAnim().getName();
+        editedName = editedName.replaceAll("Idle_", "");
+        editedName = editedName.replaceAll("Walking_", "");
+        switch(editedName.charAt(0))
+        {
+            case 'N':
+                return Position.Direction.NORTH;
+
+            case 'S':
+                return Position.Direction.SOUTH;
+
+            case 'E':
+                return Position.Direction.EAST;
+
+            case 'W':
+                return Position.Direction.WEST;
+        }
+        return null;
+    }
+
+    public static char getCurrentKey()
+    {
+        return currentKey;
+    }
+
+    public static void resetCurrentKey()
+    {
+        currentKey = '\u0000';
     }
 
     //Overriding the base paintComponent to add collider command
@@ -217,7 +269,8 @@ public class Player extends GameObject
         if(DebugConsole.SHOW_MOUSE_COORS)
         {
             g.setColor(Color.BLACK);
-            g.drawString(GUIManager.GetMousePosition().toString(), GUIManager.GetMousePosition().x, GUIManager.GetMousePosition().y + 2);
+            Position mPos = new Position(GUIManager.getMousePosition().x, GUIManager.getMousePosition().y);
+            g.drawString(GUIManager.getMousePosition().toString(), mPos.x, mPos.y + 2);
         }
 
         //Anim info
