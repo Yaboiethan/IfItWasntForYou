@@ -92,6 +92,14 @@ public class Animator
                 }
             }
         }
+        try //Throw exception if animation not found
+        {
+            throw new Exception("Animation does not exist");
+        }
+        catch (Exception e)
+        {
+            GUIManager.debugConsole.AddTextToView(e.toString());
+        }
     }
 
     private Image getNextFrame()

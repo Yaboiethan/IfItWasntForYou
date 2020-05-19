@@ -12,6 +12,7 @@ public class Textbox extends JComponent
     private Position textOffset;
     public static int FILE_MIN = 0;
     public static int FILE_MAX;
+    private File errorFile;
 
     //TODO Font
     //private Font thisFont;
@@ -39,7 +40,7 @@ public class Textbox extends JComponent
         textOffset = new Position(myPos.x + 10, myPos.y + 20);
         text = "";
         //Load the default text
-        loadTextFile("errorText");
+        errorFile = getTextFile("errorText");
     }
 
     @Override
@@ -129,15 +130,6 @@ public class Textbox extends JComponent
      */
     public void loadTextbox(File f, int min, int max)
     {
-        //Check for wrong or null file--.txt files only
-        if(f == null || !f.getName().substring(f.getName().lastIndexOf('.') + 1).equals("txt"))
-        {
-            //Load error file
-            String filePath = Textbox.class.getResource("/TextAssets/errorText.txt").getPath();
-            filePath = filePath.replaceAll("%20", " ");
-            f = new File(filePath);
-        }
-
         //Run the textbox
         GUIManager.player.setMovement(false);
         curLine = 0;
@@ -165,17 +157,32 @@ public class Textbox extends JComponent
     }
 
     /*
-    Used to pull file from resources. Needs to be called before loadTextbox is run every time to assure the internal text file
-    is set properly before every run. The errorText.txt file is reloaded after every run of the textbox to easily point out errors
+    Used to pull file from resources. The errorText.txt file is reloaded after every run of the textbox to easily point out errors
      */
-    public File loadTextFile(String fileName)
+    public File getTextFile(String fName)
     {
-        String filePath = Textbox.class.getResource("/TextAssets/" + fileName + ".txt").getPath();
+        String filePath = Textbox.class.getResource("/TextAssets/" + fName + ".txt").getPath();
         filePath = filePath.replaceAll("%20", " ");
         File f = new File(filePath);
+        return f;
+    }
 
-        FILE_MAX = 0;
+    /*
+    This method loads a text file to the Textbox to be read, should be called as the player enters a trigger of some sort
+     */
+    public void loadTextFile(File f)
+    {
+        //Check if f is null/unreadable
+        //Check for wrong or null file--.txt files only
+        if(f == null || !f.getName().substring(f.getName().lastIndexOf('.') + 1).equals("txt"))
+        {
+            //Load error file
+            String filePath = Textbox.class.getResource("/TextAssets/errorText.txt").getPath();
+            filePath = filePath.replaceAll("%20", " ");
+            f = new File(filePath);
+        }
         //Calculate FILE_MAX
+        FILE_MAX = 0;
         try
         {
             BufferedReader reader = new BufferedReader(new FileReader(f));
@@ -189,7 +196,6 @@ public class Textbox extends JComponent
         {
             GUIManager.debugConsole.AddTextToView(e.toString());
         }
-        return f;
     }
 
     /*
@@ -201,6 +207,7 @@ public class Textbox extends JComponent
         textboxActive = false;
         GUIManager.player.setMovement(true);
         //Reload base file to spot errors
-        loadTextFile("errorText");
+        FILE_MAX = 0;
+        loadTextFile(errorFile);
     }
 }

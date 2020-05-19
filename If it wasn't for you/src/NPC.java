@@ -17,10 +17,10 @@ public class NPC extends GameObject
 
     //Movement
     private int speed = 2;
-    private Position toMove;
+    Position.Direction dir;
+    private int curMoved = 0;
+    private int moveAmt = 0;
     private boolean isMoving = false;
-    private int yAdjustment;
-    private int xAdjustment;
 
     public NPC(Position startingPos)
     {
@@ -35,7 +35,7 @@ public class NPC extends GameObject
         rect.setRect(myPos.x - 12, myPos.y - 10, getSpriteSize().width + 24, getSpriteSize().height + 20);
         myTrig = new TriggerCollider(rect, true);
         //Set up my file
-        myText = GUIManager.uiManager.getTextbox().loadTextFile("sample");
+        //myText = GUIManager.uiManager.getTextbox().getTextFile("sample");
     }
 
     private void InitializeAnimator()
@@ -57,31 +57,27 @@ public class NPC extends GameObject
 
     public void Update() //To be run every frame
     {
+        //Check if moving
+        if(isMoving)
+        {
+            move();
+        }
+
         //Check if in trigger
         if(myTrig.getInTrigger())
         {
             if(!Textbox.isTextboxActive()) //Make sure textbox isn't active
             {
+                GUIManager.uiManager.getTextbox().loadTextFile(myText);
                 //TODO Replace with multiple types
                 Player p = (Player) myTrig.getOther();
-                //TODO Face Player
                 anim.setCurrentAnimation("Idle_" + Position.getDirectionAbbrev(Position.getOppositeDirection(p.getDirection())));
                 GUIManager.uiManager.getTextbox().loadTextbox(myText, Textbox.FILE_MIN, Textbox.FILE_MAX);
             }
         }
         myCol.UpdateCollider();
+        anim.UpdateAnimator();
         myTrig.UpdateCollider();
-
-        //Reset after textbox is off
-        if(!anim.getCurAnim().getName().equals("Idle_S") && !Textbox.isTextboxActive())
-        {
-            anim.setCurrentAnimation("Idle_S");
-        }
-
-        if(isMoving)
-        {
-            move();
-        }
     }
 
     @Override
@@ -104,37 +100,83 @@ public class NPC extends GameObject
     /*
     This method initializes the movement that will later take place in the Update loop
      */
-    public void moveTo(Position pos)
+    public void moveIn(Position.Direction dir, int amt)
     {
-        if(!myPos.equals(pos))
-        {
-            isMoving = true;
-            //Calculate y alignment. + == Above, - == Below
-            toMove = pos;
-            yAdjustment = Integer.compare(myPos.y, toMove.y) * -1;
-            xAdjustment = Integer.compare(myPos.x, toMove.x);
-        }
+        isMoving = true;
+        this.dir = dir;
+        moveAmt = amt;
+    }
+
+    public void turn(Position.Direction dir)
+    {
+        anim.setCurrentAnimation("Idle_" + Position.getDirectionAbbrev(dir));
     }
 
     private void move()
     {
-        //Check if needs to stop
-        if(myPos.equals(toMove))
+        //Check if done
+        if(curMoved >= moveAmt)
         {
             isMoving = false;
-            //TODO Reset
+            curMoved = 0;
+            return;
         }
-
-        //Start by aligning y
-        if(myPos.y != toMove.y || myPos.y != toMove.y + 2 || myPos.y != toMove.y - 2)
+        //Set animation if not done so
+        anim.setCurrentAnimation("Idle_" + Position.getDirectionAbbrev(dir));
+        Position toMove = new Position(0,0);
+        switch(dir)
         {
-            //Check if point is occupied
-            if(!GUIManager.pointIntersectsCollider(new Position (myPos.x, myPos.y + (speed * yAdjustment))))
-            {
-                myPos.y += speed * yAdjustment;
-            }
+            case NORTH:
+                //Check if can move
+                if(!GUIManager.pointIntersectsCollider(new Position(myPos.x, myPos.y - speed), myCol))
+                {
+                    myPos = new Position(myPos.x, myPos.y - speed);
+                }
+                else
+                {
+                    curMoved = moveAmt;
+                }
+                break;
+
+            case EAST:
+                //Check if can move
+                if(!GUIManager.pointIntersectsCollider(new Position(myPos.x + getSpriteSize().width + speed, myPos.y), myCol))
+                {
+                    myPos = new Position(myPos.x + speed, myPos.y);
+                }
+                else
+                {
+                    curMoved = moveAmt;
+                }
+                break;
+
+            case SOUTH:
+                //Check if can move
+                if(!GUIManager.pointIntersectsCollider(new Position(myPos.x, (myPos.y + getSpriteSize().height) + speed), myCol))
+                {
+                    myPos = new Position(myPos.x, myPos.y + speed);
+                }
+                else
+                {
+                    curMoved = moveAmt;
+                }
+                break;
+
+            case WEST:
+                //Check if can move
+                if(!GUIManager.pointIntersectsCollider(new Position(myPos.x - speed, myPos.y), myCol))
+                {
+                    myPos = new Position(myPos.x - speed, myPos.y);
+                }
+                else
+                {
+                    curMoved = moveAmt;
+                }
+                break;
         }
+        curMoved++;
     }
+
 
     //Sets and Gets
     public int getSpeed()
@@ -145,5 +187,10 @@ public class NPC extends GameObject
     public void setSpeed(int speed)
     {
         this.speed = speed;
+    }
+
+    public void setAnimation(String name)
+    {
+        anim.setCurrentAnimation(name);
     }
 }

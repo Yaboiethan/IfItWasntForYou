@@ -61,7 +61,7 @@ public class GUIManager {
         //Add TestNPC
         NPC testGirl = new NPC(new Position(150,200));
         playArea.add(testGirl);
-        npcs.add(testGirl); //Add to array
+        npcs.add(testGirl); //Add to arraylist
         eGui.revalidate();
 
         //Add the player
@@ -152,11 +152,17 @@ public class GUIManager {
         return mousePos;
     }
 
-    public static boolean pointIntersectsCollider(Position pos)
+    public static boolean pointIntersectsCollider(Position pos, Collider me)
     {
         boolean flag = false;
         for(Collider c: colliders)
         {
+            //Check if same
+            if(me.isSame(c))
+            {
+                continue;
+            }
+
             if(!(c instanceof TriggerCollider) && c.col.contains(pos.x, pos.y))
             {
                 flag = true;

@@ -130,7 +130,6 @@ public abstract class GameObject extends JComponent
     {
         //Set the variable
         spriteScaleFactor = factor;
-
         //Actual Math
         int width = (int) Math.round(sprite.getWidth(this) * factor);
         int height = (int) Math.round(sprite.getHeight(this) * factor);

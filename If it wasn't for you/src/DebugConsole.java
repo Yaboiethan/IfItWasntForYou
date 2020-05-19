@@ -11,10 +11,10 @@ public class DebugConsole extends JFrame
     private JTextArea viewArea;
     //Used to keep track of what commands are valid
     private final String[] commands = {"!help", "!toggleColliders", "!toggleMouseCoors", "!showCenter",
-            "!togglePos", "!toggleAnim", "!showTarotDeck", "!moveNPC"};
+            "!togglePos", "!toggleAnim", "!showTarotDeck"};
     private final String[] descriptions = {"Displays all commands", "Toggles Collider visuals",
             "Toggle Mouse Coordinates", "Displays center of object", "Shows object Position",
-            "Show object animation information", "Displays order of Tarot Cards", "Moves npc to specified point"};
+            "Show object animation information", "Displays order of Tarot Cards"};
 
     //Static debug variables to enact changes
     public static boolean SHOW_COLLIDERS;
@@ -159,28 +159,6 @@ public class DebugConsole extends JFrame
 
             case 6: //Tarot deck
                 AddTextToView(GUIManager.getDeck().toString());
-                break;
-
-            case 7: //Move NPC
-                //Get index first
-                int toGet = Integer.parseInt(JOptionPane.showInputDialog("Enter NPC Index"));
-                //Check if exists
-                if(GUIManager.getNpcs().size() < toGet)
-                {
-                    int posX = Integer.parseInt(JOptionPane.showInputDialog("Enter X location"));
-                    int posY = Integer.parseInt(JOptionPane.showInputDialog("Enter Y Location"));
-                    //Error check
-                    if(posX < 0 || posX > 500 || posY < 0 || posY > 500) //TODO Replace with scaled dimensions
-                    {
-                        AddTextToView("Coordinates entered out of bounds");
-                        return;
-                    }
-                    GUIManager.getNpcs().get(toGet).moveTo(new Position(posX, posY));
-                }
-                else
-                {
-                    AddTextToView("NPC at " + toGet + " does not exist.");
-                }
                 break;
         }
     }
