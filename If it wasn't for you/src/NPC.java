@@ -35,7 +35,7 @@ public class NPC extends GameObject
         rect.setRect(myPos.x - 12, myPos.y - 10, getSpriteSize().width + 24, getSpriteSize().height + 20);
         myTrig = new TriggerCollider(rect, true);
         //Set up my file
-        //myText = GUIManager.uiManager.getTextbox().getTextFile("sample");
+        myText = GUIManager.uiManager.getTextbox().getTextFile("sample");
     }
 
     private void InitializeAnimator()
