@@ -35,7 +35,7 @@ public class TarotDeck
         }
         catch (ArrayIndexOutOfBoundsException e)
         {
-            GUIManager.debugConsole.AddTextToView("Tarot Deck out of bounds");
+            GameRunner.debugConsole.AddTextToView("Tarot Deck out of bounds");
         }
         return null;
     }

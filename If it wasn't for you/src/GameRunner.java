@@ -1,16 +1,15 @@
-import javax.swing.*;
-import java.awt.*;
+/*
+The GameRunner class contains all the game elements themselves and the various lists needed to keep the game running
+//TODO Generate Maps through libtiled library
+ */
 import java.awt.event.*;
 import java.util.ArrayList;
 
-public class GUIManager {
-    //Frame variables
-    static JFrame eGui = new JFrame();
-    public static final Dimension defaultSize = new Dimension(500, 500);
-    static JLayeredPane playArea = new JLayeredPane();
+public class GameRunner {
+    //Frame variables (Statics)
+    static GameFrame eGui;
     public static Player player;
     private static TarotDeck deck;
-    public static UIManager uiManager;
 
     //ArrayLists for updating
     private static ArrayList<Collider> colliders = new ArrayList<>();
@@ -19,79 +18,39 @@ public class GUIManager {
     //Debug Variables
     public static DebugConsole debugConsole = new DebugConsole();
     private static Position mousePos = new Position(0,0);
+    public static boolean hitEThisFrame;
 
     public static void main(String[] args)
     {
         deck = new TarotDeck();
         deck.Shuffle();
+        eGui = new GameFrame();
         Initialize();
     }
 
     private static void Initialize()
     {
-        //Set up the window basics
-        eGui.setTitle("If it wasn't for you");
-        eGui.setSize(500, 500);
-        eGui.setResizable(false);
-        eGui.setDefaultCloseOperation(eGui.EXIT_ON_CLOSE);
-
-        //Set up the UI Layer
-        uiManager = new UIManager(eGui);
-        eGui.add(uiManager);
-
-        //Set up the play area
-        playArea.setPreferredSize(new Dimension(500, 500));
-        playArea.setLayout(new BorderLayout());
-        playArea.setBorder(BorderFactory.createTitledBorder("Play Area"));
-        //Enable window
-        eGui.add(playArea);
-        eGui.setVisible(true);
         //Add the first card
         TarotCard testCard = deck.GetCard(0);
         testCard.setPosition(150, 280);
-        playArea.add(testCard);
+        eGui.addToPlayArea(testCard);
         testCard.flip();
 
         //Add MarketCollider
         SceneObject testCollider = new SceneObject(new Position(100,100), "Market Tent");
         //testCollider.myCol.UpdateCollider();
-        playArea.add(testCollider);
-        eGui.revalidate();
+        eGui.addToPlayArea(testCollider);
 
         //Add TestNPC
         NPC testGirl = new NPC(new Position(150,200));
-        playArea.add(testGirl);
+        eGui.addToPlayArea(testGirl);
         npcs.add(testGirl); //Add to arraylist
-        eGui.revalidate();
 
         //Add the player
         player = new Player(new Position(250, 200));
-        playArea.add(player);
+        eGui.addToPlayArea(player);
 
-        //Add player keylisteners
-        eGui.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                player.setMoving(true, e.getKeyChar());
-                //Debug log
-                if(e.getKeyCode() == KeyEvent.VK_F1) //F1 brings up debug log
-                {
-                   if(!debugConsole.isVisible())
-                   {
-                       debugConsole.setVisible(true);
-                   }
-                   else
-                   {
-                       debugConsole.setVisible(false);
-                   }
-                }
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-                player.setMoving(false, e.getKeyChar());
-            }
-        });
+        //Add listener for mouse position
         eGui.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
@@ -105,11 +64,16 @@ public class GUIManager {
         GameUpdate();
     }
 
-    private static void GameUpdate() {
+    /*
+    This method runs all of the GameObject Update() methods and helps keep the game running.
+    If something needs to be updated, it needs to be called here.
+     */
+    private static void GameUpdate()
+    {
         while (eGui.isVisible())
         {
             //UIManager Update
-            uiManager.Update();
+            GameFrame.uiManager.Update();
 
             //Player Update
             player.Update();
@@ -130,11 +94,6 @@ public class GUIManager {
                 System.out.println("Interruption Exception");
             }
         }
-    }
-
-    public void addComponentToScreen(GameObject j) {
-        eGui.add(j);
-        eGui.revalidate();
     }
 
     public static void addtoColliders(Collider c)

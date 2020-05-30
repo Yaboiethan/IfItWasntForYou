@@ -4,26 +4,32 @@ import java.io.*;
 
 public class Textbox extends JComponent
 {
-    //Variables
-    private Image boxImg;
+    //Images
+    private Image boxImg; //The actual texbox image
     private Image arrowImg;
+    //Images--Selection Boxes
+    private Image selectionBox;
+    private Image highlightBox;
+
+    //Text and positioning
     private String text = "";
     private Position myPos;
     private Position textOffset;
-    public static int FILE_MIN = 0;
-    public static int FILE_MAX;
-    private File errorFile;
 
     //TODO Font
-    //private Font thisFont;
+    private Font thisFont = new Font("TimesRoman", Font.PLAIN, 18);
 
-    //TODO Profile Pictures
+    //TODO Character Names
 
     //Running the Textbox
     private static boolean textboxActive = false;
+    private static boolean canUse = true; //used to stop selecting in event
     private int curLine = 1;
     private String[] lines;
-    private double buffer = 1;
+
+    //Events
+    private TextboxChoiceEvent curEvent;
+    private int curOption = 0;
 
     //Text Writing
     private String toWrite = "";
@@ -35,12 +41,14 @@ public class Textbox extends JComponent
     public Textbox(Image box, Position pos)
     {
         boxImg = box;
+        //Get various images
         arrowImg = GameObject.getResource("/Sprites/UI/Arrow.png");
+        selectionBox = GameObject.getResource("/Sprites/UI/SelectionBox.jpg");
+        highlightBox = GameObject.getResource("/Sprites/UI/HighlightBox.png");
+        //Set the remaining variables
         myPos = pos;
         textOffset = new Position(myPos.x + 10, myPos.y + 20);
         text = "";
-        //Load the default text
-        errorFile = getTextFile("errorText");
     }
 
     @Override
@@ -50,38 +58,66 @@ public class Textbox extends JComponent
         g.drawImage(boxImg, myPos.x, myPos.y, null);
         if(text != null)
         {
+            g.setFont(thisFont);
             g.drawString(text, textOffset.x, textOffset.y);
         }
         //Show notification to move on
-        if(text.equals(toWrite) && !isWriting && toWrite != "")
+        if(text.equals(toWrite) && !isWriting)
         {
-            g.drawImage(arrowImg, myPos.x + boxImg.getWidth(null) / 2 - 25, 470, null);
+            g.drawImage(arrowImg, myPos.x + boxImg.getWidth(null) / 2 - 25, myPos.y + boxImg.getHeight(null) / 3, null);
         }
+        //Show event stuff
+        if(curEvent != null && !isWriting)
+        {
+            g.drawImage(selectionBox, myPos.x + boxImg.getWidth(null) - selectionBox.getWidth(null) - 10,
+                    myPos.y - selectionBox.getHeight(null) - 5, null);
+            //Draw all the options in text
+            int yOffset = 0;
+            for(int i = 0; i < curEvent.getAllOptions().length; i++) //Draw all options
+            {
+                g.drawString(curEvent.getAllOptions()[i], myPos.x + boxImg.getWidth(null) - selectionBox.getWidth(null) - 5,
+                        420 - selectionBox.getHeight(null) + yOffset);
+                yOffset += (selectionBox.getHeight(null) - 5) / 4;
+            }
+            //Draw the highlight box
+            g.drawImage(highlightBox, myPos.x + boxImg.getWidth(null) - selectionBox.getWidth(null) - 5,
+                    myPos.y - selectionBox.getHeight(null) + (50 * curOption) - 5, null);
+        }
+    }
+
+    public void paintOverride(Graphics g) //Used in UIManager to display graphics regardless of active setting
+    {
+        super.paintComponent(g);
+        g.drawImage(boxImg, myPos.x, myPos.y, null); //Draw the box
+        g.drawImage(arrowImg, myPos.x + boxImg.getWidth(null) / 2 - 25, myPos.y + boxImg.getHeight(null) / 3, null); //Draw arrow
+        //Draw Options box
+        g.drawImage(selectionBox, myPos.x + boxImg.getWidth(null) - selectionBox.getWidth(null) - 10,
+                myPos.y - selectionBox.getHeight(null) - 5, null);
+        //Draw the highlight box
+        g.drawImage(highlightBox, myPos.x + boxImg.getWidth(null) - selectionBox.getWidth(null) - 5,
+                myPos.y - selectionBox.getHeight(null) + (50 * curOption) - 5, null);
     }
 
     public void Update()
     {
-        if(Player.getCurrentKey() == 'e' && textboxActive && !isWriting)
+        if(GameRunner.hitEThisFrame && textboxActive && !isWriting)
         {
-            buffer += 0.5;
-            //Go to next line or deactivate textbox
-            if(curLine < lines.length)
+            if(canUse)
             {
-                if(buffer >= 1)
+                //Go to next line or deactivate textbox
+                if(curLine < lines.length)
                 {
                     text = "";
                     toWrite = lines[curLine];
                     curLine++;
-                    buffer = 0;
                     isWriting = true;
                     curChar = 0;
                     textCounter = 1;
                 }
-            }
-            else if (buffer >= 1)
-            {
-                unloadTextbox();
-                buffer = 1;
+                else
+                {
+                    unloadTextbox();
+                }
             }
         }
 
@@ -91,7 +127,6 @@ public class Textbox extends JComponent
             if(text.equals(toWrite))
             {
                 isWriting = false;
-                //TODO Display Arrow Notification
                 return;
             }
 
@@ -104,7 +139,7 @@ public class Textbox extends JComponent
                 }
                 catch (NullPointerException e) //try catch to prevent crashing during a nullpointer
                 {
-                    GUIManager.debugConsole.AddTextToView(e.toString());
+                    GameRunner.debugConsole.AddTextToView(e.toString());
                     unloadTextbox();
                 }
                 curChar++;
@@ -122,44 +157,89 @@ public class Textbox extends JComponent
         return textboxActive;
     }
 
+    public int getCurLine()
+    {
+        return curLine;
+    }
+
+    public int getCurOption() {
+        return curOption;
+    }
+
     //Practical Functions
 
     /*
     The loadTextbox function loads a txt file of dialog and activates the text box
     f must have the '.txt' extension in order to work.
      */
-    public void loadTextbox(File f, int min, int max)
+    public void loadTextbox(LoadedTextFile f)
     {
+        //Reset some things
+        resetTextbox();
+        toWrite = "";
+
         //Run the textbox
-        GUIManager.player.setMovement(false);
-        curLine = 0;
+        GameRunner.player.setMovement(false);
+        BufferedReader reader;
         try
         {
-            BufferedReader bufRead = new BufferedReader(new FileReader(f));
-            lines = new String[max - min]; //Create fresh array
+            reader = new BufferedReader(new FileReader(f.getmFile()));
+            lines = new String[f.getMax() - f.getMin()]; //Create fresh array
             String line = "";
             int ct = 0;
-            while ((line = bufRead.readLine()) != null) //Add the lines
+            int i = 0;
+            while ((line = reader.readLine()) != null) //Add the lines
             {
-                if(ct >= min)
+                if(ct >= f.getMin() && ct <= f.getMax())
                 {
-                    lines[ct] = line;
+                    if(i < lines.length)
+                    {
+                        lines[i] = line;
+                        i++;
+                    }
                 }
                 ct++;
             }
-            bufRead.close();
+            reader.close();
+            //Ready the text
+            toWrite = lines[0];
+            isWriting = true;
         }
         catch (IOException e)
         {
-            GUIManager.debugConsole.AddTextToView(e.toString());
+            GameRunner.debugConsole.AddTextToView(e.toString());
         }
         textboxActive = true;
+        revalidate();
+        repaint();
+    }
+
+    public static int getFileMax(File f)
+    {
+        int toRet = 0;
+        //Check if f is null/unreadable
+        BufferedReader reader = null;
+        try
+        {
+            reader = new BufferedReader(new FileReader(f));
+            String line = "";
+            while((line = reader.readLine()) != null)
+            {
+                toRet++;
+            }
+            reader.close();
+        }
+        catch (IOException e) //Something went wrong with reading the file, likely the file is not loaded properly (or at all)
+        {
+            GameRunner.debugConsole.AddTextToView(e.toString());
+        }
+        return toRet;
     }
 
     /*
     Used to pull file from resources. The errorText.txt file is reloaded after every run of the textbox to easily point out errors
      */
-    public File getTextFile(String fName)
+    public static File getTextFile(String fName)
     {
         String filePath = Textbox.class.getResource("/TextAssets/" + fName + ".txt").getPath();
         filePath = filePath.replaceAll("%20", " ");
@@ -168,46 +248,42 @@ public class Textbox extends JComponent
     }
 
     /*
-    This method loads a text file to the Textbox to be read, should be called as the player enters a trigger of some sort
-     */
-    public void loadTextFile(File f)
-    {
-        //Check if f is null/unreadable
-        //Check for wrong or null file--.txt files only
-        if(f == null || !f.getName().substring(f.getName().lastIndexOf('.') + 1).equals("txt"))
-        {
-            //Load error file
-            String filePath = Textbox.class.getResource("/TextAssets/errorText.txt").getPath();
-            filePath = filePath.replaceAll("%20", " ");
-            f = new File(filePath);
-        }
-        //Calculate FILE_MAX
-        FILE_MAX = 0;
-        try
-        {
-            BufferedReader reader = new BufferedReader(new FileReader(f));
-            String line = "";
-            while((line = reader.readLine()) != null)
-            {
-                FILE_MAX++;
-            }
-        }
-        catch (IOException e) //Something went wrong with reading the file, likely the file is not loaded properly (or at all)
-        {
-            GUIManager.debugConsole.AddTextToView(e.toString());
-        }
-    }
-
-    /*
     This method is run at the end of the textbox command to return movement to the player and 'disable' the textbox
     In addition, the errorText file is reloaded to errors can be pointed out easier
      */
     private void unloadTextbox()
     {
+        resetTextbox();
+        GameRunner.player.setMovement(true);
+    }
+
+    private void resetTextbox()
+    {
+        curEvent = null;
+        canUse = true;
+        lines = null;
+        //isWriting = false;
+        curLine = 1;
         textboxActive = false;
-        GUIManager.player.setMovement(true);
-        //Reload base file to spot errors
-        FILE_MAX = 0;
-        loadTextFile(errorFile);
+        curChar = 0;
+        text = "";
+    }
+
+    //TEXTBOX EVENTS
+    public void TriggerChoiceEvent(TextboxChoiceEvent event)
+    {
+        //Stop the textbox
+        canUse = false;
+        //Display the box
+        curEvent = event;
+        curOption = 0;
+    }
+
+    public void changeCurOption(int add)
+    {
+        if(curOption - add < curEvent.getAllOptions().length && curOption - add >= 0)
+        {
+            curOption -= add;
+        }
     }
 }

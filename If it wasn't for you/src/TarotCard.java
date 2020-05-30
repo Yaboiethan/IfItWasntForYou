@@ -31,7 +31,7 @@ public class TarotCard extends GameObject
         }
         catch (IOException e)
         {
-            GUIManager.debugConsole.AddTextToView("Attempt to load " + arcana + " card failed.");
+            GameRunner.debugConsole.AddTextToView("Attempt to load " + arcana + " card failed.");
         }
     }
 

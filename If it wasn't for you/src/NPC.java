@@ -2,7 +2,6 @@
 NPCs are gameobjects that interact (or at least have the capacity to) with the player in some form:
 dialogue, walking colliders, stuff like that
  */
-
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
@@ -12,7 +11,7 @@ public class NPC extends GameObject
     //Variables
     private Collider myCol;
     private TriggerCollider myTrig;
-    private File myText;
+    private LoadedTextFile myText;
     private Animator anim;
 
     //Movement
@@ -21,6 +20,9 @@ public class NPC extends GameObject
     private int curMoved = 0;
     private int moveAmt = 0;
     private boolean isMoving = false;
+    //TODO Remove this textEvent
+    private TextboxChoiceEvent testEvent;
+    private int triggerRefresh = 3;
 
     public NPC(Position startingPos)
     {
@@ -35,7 +37,14 @@ public class NPC extends GameObject
         rect.setRect(myPos.x - 12, myPos.y - 10, getSpriteSize().width + 24, getSpriteSize().height + 20);
         myTrig = new TriggerCollider(rect, true);
         //Set up my file
-        myText = GUIManager.uiManager.getTextbox().getTextFile("sample");
+        myText = new LoadedTextFile(Textbox.getTextFile("sample"), 0, 0);
+        myText.setMax(); //Set to max of text file
+        //Set up the testEvent
+        testEvent = new TextboxChoiceEvent(new String[]{"Yes", "No"}, 2);
+
+        //Build 2 choices in the event
+        testEvent.addChoiceOutcome(new LoadedTextFile(Textbox.getTextFile("choiceTest"), 0, 3));
+        testEvent.addChoiceOutcome(new LoadedTextFile(Textbox.getTextFile("choiceTest"), 4, 7));
     }
 
     private void InitializeAnimator()
@@ -68,16 +77,41 @@ public class NPC extends GameObject
         {
             if(!Textbox.isTextboxActive()) //Make sure textbox isn't active
             {
-                GUIManager.uiManager.getTextbox().loadTextFile(myText);
                 //TODO Replace with multiple types
-                Player p = (Player) myTrig.getOther();
+                Player p = (Player) myTrig.getOther().thisObj;
                 anim.setCurrentAnimation("Idle_" + Position.getDirectionAbbrev(Position.getOppositeDirection(p.getDirection())));
-                GUIManager.uiManager.getTextbox().loadTextbox(myText, Textbox.FILE_MIN, Textbox.FILE_MAX);
+                getUIManager().getTextbox().loadTextbox(myText);
+                myTrig.setActive(false); //Turn off the Trigger
             }
         }
+
+        //Update components
         myCol.UpdateCollider();
         anim.UpdateAnimator();
         myTrig.UpdateCollider();
+
+        if(testEvent != null && !testEvent.getIfDone())
+        {
+            testEvent.Update();
+        }
+        else if (testEvent != null)
+        {
+            testEvent = null; //Remove testEvent
+        }
+
+        //See if trigger needs refreshing
+        if(!myTrig.isActive() && !Textbox.isTextboxActive() && !GameRunner.hitEThisFrame)
+        {
+            if(triggerRefresh <= 0)
+            {
+                triggerRefresh = 3;
+                myTrig.setActive(true);
+            }
+            else
+            {
+                triggerRefresh--;
+            }
+        }
     }
 
     @Override
@@ -94,6 +128,13 @@ public class NPC extends GameObject
             g.setColor(Color.RED);
             g2d.draw(myTrig.getColObject());
             g2d.dispose();
+        }
+
+        //Anim info
+        if(DebugConsole.SHOW_ANIMATOR_INFO)
+        {
+            g.setColor(Color.BLACK);
+            g.drawString(anim.toString(), myPos.x + 5, myPos.y - 1);
         }
     }
 
@@ -128,7 +169,7 @@ public class NPC extends GameObject
         {
             case NORTH:
                 //Check if can move
-                if(!GUIManager.pointIntersectsCollider(new Position(myPos.x, myPos.y - speed), myCol))
+                if(!GameRunner.pointIntersectsCollider(new Position(myPos.x, myPos.y - speed), myCol))
                 {
                     myPos = new Position(myPos.x, myPos.y - speed);
                 }
@@ -140,7 +181,7 @@ public class NPC extends GameObject
 
             case EAST:
                 //Check if can move
-                if(!GUIManager.pointIntersectsCollider(new Position(myPos.x + getSpriteSize().width + speed, myPos.y), myCol))
+                if(!GameRunner.pointIntersectsCollider(new Position(myPos.x + getSpriteSize().width + speed, myPos.y), myCol))
                 {
                     myPos = new Position(myPos.x + speed, myPos.y);
                 }
@@ -152,7 +193,7 @@ public class NPC extends GameObject
 
             case SOUTH:
                 //Check if can move
-                if(!GUIManager.pointIntersectsCollider(new Position(myPos.x, (myPos.y + getSpriteSize().height) + speed), myCol))
+                if(!GameRunner.pointIntersectsCollider(new Position(myPos.x, (myPos.y + getSpriteSize().height) + speed), myCol))
                 {
                     myPos = new Position(myPos.x, myPos.y + speed);
                 }
@@ -164,7 +205,7 @@ public class NPC extends GameObject
 
             case WEST:
                 //Check if can move
-                if(!GUIManager.pointIntersectsCollider(new Position(myPos.x - speed, myPos.y), myCol))
+                if(!GameRunner.pointIntersectsCollider(new Position(myPos.x - speed, myPos.y), myCol))
                 {
                     myPos = new Position(myPos.x - speed, myPos.y);
                 }

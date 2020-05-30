@@ -1,0 +1,7 @@
+Choice 1:
+You selected choice 1!
+congrats
+
+Choice 2:
+You selected choice 2!
+Less congrats

@@ -4,23 +4,24 @@ import java.awt.geom.Rectangle2D;
 public class Collider
 {
     Rectangle2D col = new Rectangle();
-    private GameObject thisObj;
+    protected GameObject thisObj;
     private boolean init = false;
+    protected Collider other;
 
-    public Collider(GameObject g)
+    public Collider(GameObject g) //Viewable colliders (eg: Buildings, NPCs, Trees)
     {
         //Set up reference to attached object
         thisObj = g;
         //Set up collider size
         setCollider();
         //Add collider to GUIManager colliders list
-        GUIManager.addtoColliders(this);
+        GameRunner.addtoColliders(this);
     }
 
     public Collider(Rectangle2D bounds) //Empty Collider--static, non viewable colliders
     {
         thisObj = null;
-        GUIManager.addtoColliders(this);
+        GameRunner.addtoColliders(this);
         col = bounds;
     }
 
@@ -34,14 +35,14 @@ public class Collider
         //Should be able to successfully cast to player
         Player p = (Player) thisObj;
         setCollider();
-        for(Collider c: GUIManager.getColliders())
+        for(Collider c: GameRunner.getColliders())
         {
             if(!isSame(c)) //Make sure the objects aren't the same object
             {
                 if(col.getBounds2D().intersects(c.getColObject().getBounds2D())) //Check if colliding
                 {
-                    CollisionEnter(c);
-                    c.CollisionEnter(thisObj);
+                    CollisionEnter((Player) thisObj, c);
+                    c.CollisionEnter(this);
                 }
             }
         }
@@ -74,12 +75,12 @@ public class Collider
     }
 
     //Collider Events
-    protected void CollisionEnter(Collider c)
+    private void CollisionEnter(Player p, Collider c) //Meant for overriding in other Colliders
     {
+        other = c;
         int offsetH = thisObj.getSpriteSize().height - Player.getSpeed();
         int offsetW = (thisObj.getSpriteSize().width / 4) - Player.getSpeed();
         boolean isTrigger = c instanceof TriggerCollider; //Make sure movement isn't stopped by TriggerColliders
-        Player p = (Player) thisObj;
         if(getColObject().getMaxY() - offsetH == (c.getColObject().getMaxY() + 1)) //North
         {
             if(!isTrigger)
@@ -114,9 +115,9 @@ public class Collider
         }
     }
 
-    void CollisionEnter(GameObject other) //Empty method for overriding
+    protected void CollisionEnter(Collider c)
     {
-
+        other = c;
     }
 
     protected void CollisionExit(Position.Direction d)
@@ -128,10 +129,10 @@ public class Collider
 
     protected void CollisionExit() //Empty method for overriding
     {
-
+        other = null;
     }
 
-    private void setCollider()
+    protected void setCollider()
     {
         if(thisObj != null) //Make sure GameObject is filled
         {
@@ -177,5 +178,10 @@ public class Collider
     public String toString()
     {
         return getColObject().getBounds2D().toString();
+    }
+
+    public Collider getOther()
+    {
+        return other;
     }
 }

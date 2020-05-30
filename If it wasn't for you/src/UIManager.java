@@ -1,6 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
 
 public class UIManager extends JLayeredPane
 {
@@ -43,12 +42,22 @@ public class UIManager extends JLayeredPane
             {
                 textBox.paintComponent(g);
             }
+            else if (DebugConsole.OVERRIDE_TEXTBOX_VISUALS)
+            {
+                textBox.paintOverride(g);
+            }
         }
     }
 
     public void Update()
     {
-        textBox.Update();
+        if(Textbox.isTextboxActive())
+        {
+            textBox.Update();
+        }
+
+        //Update black screen
+        //TODO Screen wiping
     }
 
     //Various Sets and Gets
@@ -60,11 +69,6 @@ public class UIManager extends JLayeredPane
     public void setShowBlackScreen(boolean showBlackScreen)
     {
         this.showBlackScreen = showBlackScreen;
-    }
-
-    public boolean getTextboxStatus()
-    {
-        return Textbox.isTextboxActive();
     }
 
     public Textbox getTextbox()

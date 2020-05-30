@@ -107,72 +107,29 @@ public class Player extends GameObject
     }
 
     //Sets and Gets
-    public void setMoving(boolean m, char key)
+    public void setMoving(boolean m, char key) //Set the key being pressed and if the player is moving
     {
         currentKey = key;
         isMoving = m;
-        //Animation Stuff
-        switch(key)
+        //Animation stuff
+        if(getMovement(Position.charToDirection(currentKey))) //Check if can move in direction
         {
-            case 'w': //North
-                if(mNorth)
-                {
-                    if(isMoving)
-                    {
-                        anim.setCurrentAnimation("Walking_N");
-                    }
-                    else
-                    {
-                        anim.setCurrentAnimation("Idle_N");
-                    }
-                }
-                break;
-
-            case 'a': //West
-                if(mWest)
-                {
-                    if(isMoving)
-                    {
-                        anim.setCurrentAnimation("Walking_W");
-                    }
-                    else
-                    {
-                        anim.setCurrentAnimation("Idle_W");
-                    }
-                }
-                break;
-
-            case 's': //South
-                if(mSouth)
-                {
-                    if(isMoving)
-                    {
-                        anim.setCurrentAnimation("Walking_S");
-                    }
-                    else
-                    {
-                        anim.setCurrentAnimation("Idle_S");
-                    }
-                }
-                break;
-
-            case 'd': //East
-                if(mEast)
-                {
-                    if(isMoving)
-                    {
-                        anim.setCurrentAnimation("Walking_E");
-                    }
-                    else
-                    {
-                        anim.setCurrentAnimation("Idle_E");
-                    }
-                }
-                break;
+            if(m)
+            {
+                anim.setCurrentAnimation("Walking_" + Position.getDirectionAbbrev(Position.charToDirection(currentKey)));
+            }
+            else
+            {
+                anim.setCurrentAnimation("Idle_" + Position.getDirectionAbbrev(Position.charToDirection(currentKey)));
+            }
+        }
+        else
+        {
+            anim.setCurrentAnimation("Idle_" + Position.getDirectionAbbrev(getDirection()));
         }
     }
 
-    public void setMovement(boolean b, Position.Direction dir)
+    public void setMovement(boolean b, Position.Direction dir) //Enable/Disable movement in specific direction
     {
         switch(dir)
         {
@@ -195,6 +152,26 @@ public class Player extends GameObject
         }
     }
 
+    private boolean getMovement(Position.Direction d)
+    {
+        switch(d)
+        {
+            case NORTH:
+                return mNorth;
+
+            case EAST:
+                return mEast;
+
+            case SOUTH:
+                return mSouth;
+
+            case WEST:
+                return mWest;
+
+        }
+        return false;
+    }
+
     public void setMovement(boolean b) //Used to disable/enable all movement at once (IE: Textbox)
     {
         mNorth = b;
@@ -204,7 +181,7 @@ public class Player extends GameObject
         //Check if false for animation correction
         if(!b)
         {
-            String animName = "Idle_" + getDirection().toString().substring(0,1);
+            String animName = "Idle_" + Position.getDirectionAbbrev(getDirection());
             anim.setCurrentAnimation(animName);
         }
     }
@@ -219,7 +196,7 @@ public class Player extends GameObject
         return myCol;
     }
 
-    public Position.Direction getDirection()
+    public Position.Direction getDirection() //Get the direction the player is facing
     {
         String editedName = anim.getCurAnim().getName();
         editedName = editedName.replaceAll("Idle_", "");
@@ -243,7 +220,7 @@ public class Player extends GameObject
 
     public static char getCurrentKey()
     {
-        return currentKey;
+        return Character.toUpperCase(currentKey);
     }
 
     public static void resetCurrentKey()
@@ -251,7 +228,7 @@ public class Player extends GameObject
         currentKey = '\u0000';
     }
 
-    //Overriding the base paintComponent to add collider command
+    //Overriding the base paintComponent to add various Debug things
     @Override
     protected void paintComponent(Graphics g) {
 
@@ -269,8 +246,8 @@ public class Player extends GameObject
         if(DebugConsole.SHOW_MOUSE_COORS)
         {
             g.setColor(Color.BLACK);
-            Position mPos = new Position(GUIManager.getMousePosition().x, GUIManager.getMousePosition().y);
-            g.drawString(GUIManager.getMousePosition().toString(), mPos.x, mPos.y + 2);
+            Position mPos = new Position(GameRunner.getMousePosition().x, GameRunner.getMousePosition().y);
+            g.drawString(GameRunner.getMousePosition().toString(), mPos.x, mPos.y + 2);
         }
 
         //Anim info
@@ -342,5 +319,20 @@ public class Player extends GameObject
                 touchedCols[3] = null;
                 break;
         }
+    }
+
+    public static boolean isValidKey(char key)
+    {
+        key = Character.toUpperCase(key);
+        boolean flag = false;
+        char[] acceptedKeys = new char[] {'W', 'A', 'S', 'D'};
+        for(char c: acceptedKeys)
+        {
+            if(c == key)
+            {
+                flag = true;
+            }
+        }
+        return flag;
     }
 }

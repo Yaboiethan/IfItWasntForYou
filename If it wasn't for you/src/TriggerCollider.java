@@ -10,44 +10,44 @@ public class TriggerCollider extends Collider
     private boolean useButtonPress;
     private boolean hitButton;
     private boolean inTrigger = false;
-    private int toReset = 0;
-    private GameObject other;
-    public TriggerCollider(Rectangle2D bounds, boolean b) //Default
+    private boolean isActive = true;
+
+    public TriggerCollider(Rectangle2D bounds, boolean press) //Default
     {
         super(bounds);
-        useButtonPress = b;
-        GUIManager.addtoColliders(this);
+        useButtonPress = press;
+        GameRunner.addtoColliders(this);
     }
 
     //Overridden methods
+
     @Override
-    protected void CollisionEnter(GameObject other)
+    public void UpdateCollider()
     {
-        inTrigger = true;
-        this.other = other;
-        //Add button press event
-        if(useButtonPress)
+        super.UpdateCollider();
+        if(!isActive)
         {
-            if(Player.getCurrentKey() == 'e' && !hitButton)
+            return; //Stop Updating
+        }
+        hitButton = false;
+        if(useButtonPress && inTrigger)
+        {
+            if(GameRunner.hitEThisFrame)
             {
                 hitButton = true;
-                Player.resetCurrentKey();
-            }
-
-            //Reset trigger
-            if(hitButton)
-            {
-                if(toReset >= 2)
-                {
-                    toReset = 0;
-                    hitButton = false;
-                }
-                else
-                {
-                    toReset += 1;
-                }
             }
         }
+    }
+
+    @Override
+    protected void CollisionEnter(Collider other)
+    {
+        if(this.other == other)
+        {
+            return;
+        }
+        inTrigger = true;
+        this.other = other;
     }
 
     @Override
@@ -61,18 +61,27 @@ public class TriggerCollider extends Collider
     //Various gets
     public boolean getInTrigger()
     {
+        if(Textbox.isTextboxActive() || !isActive) //If the box is on, the answer is no
+        {
+            return false;
+        }
         //Check for button presses
         if(useButtonPress)
         {
-            boolean toRet = inTrigger && hitButton; //Only send flag once
-            hitButton = false;
-            return toRet;
+            return inTrigger && hitButton;
         }
         return inTrigger;
     }
 
-    public GameObject getOther()
-    {
-        return other;
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        if(active)
+        {
+            hitButton = false;
+        }
+        isActive = active;
     }
 }

@@ -11,10 +11,10 @@ public class DebugConsole extends JFrame
     private JTextArea viewArea;
     //Used to keep track of what commands are valid
     private final String[] commands = {"!help", "!toggleColliders", "!toggleMouseCoors", "!showCenter",
-            "!togglePos", "!toggleAnim", "!showTarotDeck"};
+            "!togglePos", "!toggleAnim", "!showTarotDeck", "!toggleTextboxVisuals"};
     private final String[] descriptions = {"Displays all commands", "Toggles Collider visuals",
             "Toggle Mouse Coordinates", "Displays center of object", "Shows object Position",
-            "Show object animation information", "Displays order of Tarot Cards"};
+            "Show object animation information", "Displays order of Tarot Cards", "Show/Hide Textbox visual components"};
 
     //Static debug variables to enact changes
     public static boolean SHOW_COLLIDERS;
@@ -22,6 +22,7 @@ public class DebugConsole extends JFrame
     public static boolean SHOW_OBJECT_ORIGIN;
     public static boolean SHOW_OBJECT_POSITION;
     public static boolean SHOW_ANIMATOR_INFO;
+    public static boolean OVERRIDE_TEXTBOX_VISUALS;
 
 
     //FOR USE OF TESTING DEBUG LOG
@@ -158,7 +159,12 @@ public class DebugConsole extends JFrame
                 break;
 
             case 6: //Tarot deck
-                AddTextToView(GUIManager.getDeck().toString());
+                AddTextToView(GameRunner.getDeck().toString());
+                break;
+
+            case 7: //Override textbox visuals
+                OVERRIDE_TEXTBOX_VISUALS = !OVERRIDE_TEXTBOX_VISUALS;
+                AddTextToView("Textbox Override = " + OVERRIDE_TEXTBOX_VISUALS);
                 break;
         }
     }

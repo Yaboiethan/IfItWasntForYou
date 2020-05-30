@@ -1,10 +1,11 @@
-import java.awt.*;
-import java.util.ArrayList;
-
 /*
 The Animator class is the projector that constantly spins the animation "film" and projects it onto its attached GameObject
 Animators require GameObjects to run, and will throw an error is this is not the case.
  */
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class Animator
 {
     //Private Variables
@@ -94,11 +95,11 @@ public class Animator
         }
         try //Throw exception if animation not found
         {
-            throw new Exception("Animation does not exist");
+            throw new Exception("Animation '" + n +  "' does not exist");
         }
         catch (Exception e)
         {
-            GUIManager.debugConsole.AddTextToView(e.toString());
+            GameRunner.debugConsole.AddTextToView(e.toString() + "\n    " + Arrays.toString(e.getStackTrace()));
         }
     }
 

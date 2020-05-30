@@ -1,7 +1,6 @@
 /*
 The GameObject is the basis for which all renderable things are built. A GameObject is anything that is rendered on screen and exists within the game space.
  */
-//Imports
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -55,7 +54,7 @@ public abstract class GameObject extends JComponent
         }
         catch (IOException e)
         {
-            GUIManager.debugConsole.AddTextToView("Image load failed: " + path);
+            GameRunner.debugConsole.AddTextToView("Image load failed: " + path);
         }
     }
 
@@ -76,7 +75,7 @@ public abstract class GameObject extends JComponent
         }
         catch (IOException e)
         {
-            GUIManager.debugConsole.AddTextToView(e.toString());
+            GameRunner.debugConsole.AddTextToView(e.toString());
         }
         return null;
     }
@@ -110,7 +109,7 @@ public abstract class GameObject extends JComponent
 
     public UIManager getUIManager()
     {
-        return GUIManager.uiManager;
+        return GameFrame.uiManager;
     }
 
     //Sprite Alterations
@@ -155,7 +154,7 @@ public abstract class GameObject extends JComponent
 
     public String toString()
     {
-        return myPos.toString() + "w: " + getSpriteSize().width + " h: " + getSpriteSize().height;
+        return myPos.toString() + "  Sprite: " + ogImg;
     }
 
     public boolean isEqual(GameObject g)
@@ -174,7 +173,6 @@ class Position
     int x;
     int y;
     public final static Position ORIGIN = new Position(0,0);
-    public final static Position CENTER = new Position(GUIManager.defaultSize.width / 2, GUIManager.defaultSize.height / 2);
     public enum Direction {NORTH, EAST, WEST, SOUTH};
 
     public Position()
@@ -279,5 +277,25 @@ class Position
                 return 'W';
         }
         return '\u0000'; //Something went wrong
+    }
+
+    public static Direction charToDirection(char c)
+    {
+        c = Character.toUpperCase(c);
+        switch (c)
+        {
+            case 'W': //North
+                return Direction.NORTH;
+
+            case 'A': //West
+                return Direction.WEST;
+
+            case 'S': //South
+                return Direction.SOUTH;
+
+            case 'D': //East
+                return Direction.EAST;
+        }
+        return null;
     }
 }
