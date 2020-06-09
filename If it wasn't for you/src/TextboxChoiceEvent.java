@@ -2,7 +2,7 @@
 TextboxChoiceEvents are events that trigger on certain lines and can change the line when prompted to do so.
 This event signals to the textbox that this event needs to take place and sends the result of whatever choice was made
  */
-import java.io.File;
+import java.io.*;
 import java.util.ArrayList;
 
 public class TextboxChoiceEvent
@@ -103,34 +103,52 @@ public class TextboxChoiceEvent
 /*
 LoadedTextFiles are files with minimums and maximums so that the Textbox can easily access this information from the
 event itself, rather than from an NPC or something.
+The text is stored in its entirety
  */
 class LoadedTextFile
 {
     //Variables
-    private File mFile;
+    private String[] mFile;
     private int min;
     private int max;
-    public LoadedTextFile(String name, int mi, int ma) //String file input
+
+    public LoadedTextFile(InputStream f, int mi, int ma) //Literal file input
     {
-        mFile = Textbox.getTextFile(name);
+        mFile = loadTextFileStream(f);
         min = mi;
         max = ma;
     }
 
-    public LoadedTextFile(File f, int mi, int ma) //Literal file input
+    //Practical Functions
+    public String[] loadTextFileStream(InputStream is)
     {
-        mFile = f;
-        min = mi;
-        max = ma;
+        BufferedReader bfRead = new BufferedReader(new InputStreamReader(is));
+        ArrayList<String> lines = new ArrayList<>();
+        String line = "";
+        try
+        {
+            while ((line = bfRead.readLine()) != null)
+            {
+                lines.add(line);
+            }
+            bfRead.close();
+            is.close();
+        }
+        catch (IOException e)
+        {
+            GameRunner.debugConsole.AddTextToView("Could not load text file" + e.getStackTrace());
+        }
+        String[] toRet = new String[lines.size()];
+        for(int i = 0; i < lines.size(); i++)
+        {
+            toRet[i] = lines.get(i);
+        }
+        return toRet;
     }
-
+    //Sets and Gets
     public void setMax()
     {
-        max = Textbox.getFileMax(mFile);
-    }
-
-    public File getmFile() {
-        return mFile;
+        max = mFile.length;
     }
 
     public int getMin() {
@@ -141,8 +159,12 @@ class LoadedTextFile
         return max;
     }
 
-    public String toString()
+    public String getLine(int index)
     {
-        return "File: " + getmFile().getPath() + "  MIN: " + min + "  MAX: " + max;
+        if(index < 0 || index > mFile.length)
+        {
+            return null;
+        }
+        return mFile[index];
     }
 }

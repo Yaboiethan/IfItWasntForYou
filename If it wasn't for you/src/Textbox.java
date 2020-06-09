@@ -1,8 +1,8 @@
-import javax.swing.*;
 import java.awt.*;
 import java.io.*;
+import java.util.Arrays;
 
-public class Textbox extends JComponent
+public class Textbox extends UIRenderable
 {
     //Images
     private Image boxImg; //The actual texbox image
@@ -13,7 +13,6 @@ public class Textbox extends JComponent
 
     //Text and positioning
     private String text = "";
-    private Position myPos;
     private Position textOffset;
 
     //TODO Font
@@ -38,7 +37,7 @@ public class Textbox extends JComponent
     private double textCounter;
     private int curChar;
 
-    public Textbox(Image box, Position pos)
+    public Textbox(Image box)
     {
         boxImg = box;
         //Get various images
@@ -46,7 +45,7 @@ public class Textbox extends JComponent
         selectionBox = GameObject.getResource("/Sprites/UI/SelectionBox.jpg");
         highlightBox = GameObject.getResource("/Sprites/UI/HighlightBox.png");
         //Set the remaining variables
-        myPos = pos;
+        myPos = new Position(0, SettingsMenu.getScreenResolution().height - boxImg.getHeight(null) - 50);
         textOffset = new Position(myPos.x + 10, myPos.y + 20);
         text = "";
     }
@@ -64,7 +63,7 @@ public class Textbox extends JComponent
         //Show notification to move on
         if(text.equals(toWrite) && !isWriting)
         {
-            g.drawImage(arrowImg, myPos.x + boxImg.getWidth(null) / 2 - 25, myPos.y + boxImg.getHeight(null) / 3, null);
+            g.drawImage(arrowImg, myPos.x + boxImg.getWidth(null) / 2 - 25, myPos.y + boxImg.getHeight(null) - arrowImg.getHeight(null) - 20, null);
         }
         //Show event stuff
         if(curEvent != null && !isWriting)
@@ -72,11 +71,11 @@ public class Textbox extends JComponent
             g.drawImage(selectionBox, myPos.x + boxImg.getWidth(null) - selectionBox.getWidth(null) - 10,
                     myPos.y - selectionBox.getHeight(null) - 5, null);
             //Draw all the options in text
-            int yOffset = 0;
+            int yOffset = 20;
             for(int i = 0; i < curEvent.getAllOptions().length; i++) //Draw all options
             {
                 g.drawString(curEvent.getAllOptions()[i], myPos.x + boxImg.getWidth(null) - selectionBox.getWidth(null) - 5,
-                        420 - selectionBox.getHeight(null) + yOffset);
+                        myPos.y - selectionBox.getHeight(null) + yOffset);
                 yOffset += (selectionBox.getHeight(null) - 5) / 4;
             }
             //Draw the highlight box
@@ -89,7 +88,7 @@ public class Textbox extends JComponent
     {
         super.paintComponent(g);
         g.drawImage(boxImg, myPos.x, myPos.y, null); //Draw the box
-        g.drawImage(arrowImg, myPos.x + boxImg.getWidth(null) / 2 - 25, myPos.y + boxImg.getHeight(null) / 3, null); //Draw arrow
+        g.drawImage(arrowImg, myPos.x + boxImg.getWidth(null) / 2 - 25, myPos.y + boxImg.getHeight(null) - arrowImg.getHeight(null) - 20, null);
         //Draw Options box
         g.drawImage(selectionBox, myPos.x + boxImg.getWidth(null) - selectionBox.getWidth(null) - 10,
                 myPos.y - selectionBox.getHeight(null) - 5, null);
@@ -139,7 +138,7 @@ public class Textbox extends JComponent
                 }
                 catch (NullPointerException e) //try catch to prevent crashing during a nullpointer
                 {
-                    GameRunner.debugConsole.AddTextToView(e.toString());
+                    GameRunner.debugConsole.AddTextToView(e.toString() + " " + Arrays.toString(e.getStackTrace()));
                     unloadTextbox();
                 }
                 curChar++;
@@ -177,74 +176,45 @@ public class Textbox extends JComponent
         //Reset some things
         resetTextbox();
         toWrite = "";
+        int ct = 0;
 
-        //Run the textbox
         GameRunner.player.setMovement(false);
-        BufferedReader reader;
-        try
+        lines = new String[f.getMax() - f.getMin()];
+        for(int i = 0; i < f.getMax(); i++)
         {
-            reader = new BufferedReader(new FileReader(f.getmFile()));
-            lines = new String[f.getMax() - f.getMin()]; //Create fresh array
-            String line = "";
-            int ct = 0;
-            int i = 0;
-            while ((line = reader.readLine()) != null) //Add the lines
+            if(i >= f.getMin() && i < f.getMax())
             {
-                if(ct >= f.getMin() && ct <= f.getMax())
-                {
-                    if(i < lines.length)
-                    {
-                        lines[i] = line;
-                        i++;
-                    }
-                }
+                lines[ct] = f.getLine(i);
                 ct++;
             }
-            reader.close();
-            //Ready the text
-            toWrite = lines[0];
-            isWriting = true;
         }
-        catch (IOException e)
-        {
-            GameRunner.debugConsole.AddTextToView(e.toString());
-        }
+        //Ready to Write
+        toWrite = lines[0];
+        isWriting = true;
         textboxActive = true;
         revalidate();
         repaint();
     }
 
-    public static int getFileMax(File f)
+    @Override
+    public void setPosition(Position p)
     {
-        int toRet = 0;
-        //Check if f is null/unreadable
-        BufferedReader reader = null;
-        try
-        {
-            reader = new BufferedReader(new FileReader(f));
-            String line = "";
-            while((line = reader.readLine()) != null)
-            {
-                toRet++;
-            }
-            reader.close();
-        }
-        catch (IOException e) //Something went wrong with reading the file, likely the file is not loaded properly (or at all)
-        {
-            GameRunner.debugConsole.AddTextToView(e.toString());
-        }
-        return toRet;
+        super.setPosition(p);
+        myPos = new Position(0, SettingsMenu.getScreenResolution().height - boxImg.getHeight(null) - 50);
+        textOffset = new Position(myPos.x + 10, myPos.y + 20);
+        //Get how much to resize
+        double sf = (double) (SettingsMenu.getScreenResolution().width - boxImg.getWidth(this)) / boxImg.getWidth(this);
+        //Resize
+        boxImg = ScaleHorizontally(boxImg, 0.9 + sf);
     }
 
     /*
-    Used to pull file from resources. The errorText.txt file is reloaded after every run of the textbox to easily point out errors
-     */
-    public static File getTextFile(String fName)
+        Used to pull file from resources. The errorText.txt file is reloaded after every run of the textbox to easily point out errors
+         */
+    public static InputStream getTextFile(String fName)
     {
-        String filePath = Textbox.class.getResource("/TextAssets/" + fName + ".txt").getPath();
-        filePath = filePath.replaceAll("%20", " ");
-        File f = new File(filePath);
-        return f;
+        InputStream is = Textbox.class.getResourceAsStream("/TextAssets/" + fName + ".txt");
+        return is;
     }
 
     /*

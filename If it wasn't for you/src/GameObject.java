@@ -17,7 +17,8 @@ public abstract class GameObject extends JComponent
     private Image sprite;
     private String ogImg;
     private Position offset = new Position();
-    private double spriteScaleFactor = 1;
+    private double horizontalScaleFactor = 1;
+    private double verticalScaleFactor = 1;
 
     public GameObject()
     {
@@ -50,7 +51,7 @@ public abstract class GameObject extends JComponent
         try
         {
             sprite = ImageIO.read(getClass().getResource(path));
-            ScaleSprite(spriteScaleFactor);
+            ScaleSprite();
         }
         catch (IOException e)
         {
@@ -61,7 +62,7 @@ public abstract class GameObject extends JComponent
     public void setSprite(Image i)
     {
         sprite = i;
-        ScaleSprite(spriteScaleFactor);
+        ScaleSprite();
     }
 
     /*
@@ -128,9 +129,54 @@ public abstract class GameObject extends JComponent
     public void ScaleSprite(double factor)
     {
         //Set the variable
-        spriteScaleFactor = factor;
+        horizontalScaleFactor = factor;
+        verticalScaleFactor = factor;
         //Actual Math
         int width = (int) Math.round(sprite.getWidth(this) * factor);
+        int height = (int) Math.round(sprite.getHeight(this) * factor);
+        Image tmp = sprite.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+        BufferedImage resized = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = resized.createGraphics();
+        g2d.drawImage(tmp, 0, 0, null);
+        g2d.dispose();
+        sprite = resized;
+    }
+
+    /*
+    This method uses the internal scaleFactor variables to do its math
+     */
+    public void ScaleSprite()
+    {
+        //Actual Math
+        int width = (int) Math.round(sprite.getWidth(this) * horizontalScaleFactor);
+        int height = (int) Math.round(sprite.getHeight(this) * verticalScaleFactor);
+        Image tmp = sprite.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+        BufferedImage resized = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = resized.createGraphics();
+        g2d.drawImage(tmp, 0, 0, null);
+        g2d.dispose();
+        sprite = resized;
+    }
+
+    public void ScaleHorizontally(double factor)
+    {
+        horizontalScaleFactor = factor;
+        //Actual Math
+        int width = (int) Math.round(sprite.getWidth(this) * factor);
+        int height = Math.round(sprite.getHeight(this));
+        Image tmp = sprite.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+        BufferedImage resized = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = resized.createGraphics();
+        g2d.drawImage(tmp, 0, 0, null);
+        g2d.dispose();
+        sprite = resized;
+    }
+
+    public void ScaleVertically(double factor)
+    {
+        verticalScaleFactor = factor;
+        //Actual Math
+        int width = Math.round(sprite.getWidth(this));
         int height = (int) Math.round(sprite.getHeight(this) * factor);
         Image tmp = sprite.getScaledInstance(width, height, Image.SCALE_SMOOTH);
         BufferedImage resized = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -173,7 +219,7 @@ class Position
     int x;
     int y;
     public final static Position ORIGIN = new Position(0,0);
-    public enum Direction {NORTH, EAST, WEST, SOUTH};
+    public enum Direction {NORTH, EAST, WEST, SOUTH}
 
     public Position()
     {

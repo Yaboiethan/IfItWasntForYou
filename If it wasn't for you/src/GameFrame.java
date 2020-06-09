@@ -19,7 +19,7 @@ public class GameFrame extends JFrame
     private void Initialize()
     {
         setTitle("If it wasn't for you");
-        setSize(500, 500);
+        setSize(Toolkit.getDefaultToolkit().getScreenSize());
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
@@ -29,7 +29,7 @@ public class GameFrame extends JFrame
         add(uiManager);
 
         //Set up the play area
-        playArea.setPreferredSize(new Dimension(500, 500));
+        playArea.setPreferredSize(getSize());
         playArea.setLayout(new BorderLayout());
         playArea.setBorder(BorderFactory.createTitledBorder("Play Area"));
         add(playArea);
@@ -48,7 +48,6 @@ public class GameFrame extends JFrame
                     } catch (InterruptedException interruptedException) {
                         interruptedException.printStackTrace();
                     }
-
                 }
 
                 if(Player.isValidKey(e.getKeyChar()))
@@ -83,6 +82,16 @@ public class GameFrame extends JFrame
     {
         playArea.add(c);
         revalidate();
+        repaint();
+    }
+
+    public void setResolution(Dimension d)
+    {
+        setSize(d);
+        playArea.setSize(d);
+        uiManager.setPreferredSize(d);
+        uiManager.setBounds(getBounds());
+        uiManager.getTextbox().setPosition(new Position());
         repaint();
     }
 }

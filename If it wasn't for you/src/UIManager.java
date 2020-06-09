@@ -4,20 +4,24 @@ import java.awt.*;
 public class UIManager extends JLayeredPane
 {
     //Private Variables
-    private boolean showBlackScreen = false;
+    private boolean showBlackScreen = true;
     private Textbox textBox;
+    private SettingsMenu settingsMenu;
 
     public UIManager(JFrame f)
     {
         //Set up the frame
-        setPreferredSize(new Dimension(490,470));
+        setPreferredSize(f.getSize());
         setBounds(f.getBounds());
         setLayout(null);
         setOpaque(false);
         setBackground(new Color(255, 255, 255, 0));
         //Set up the textbox image and location
-        textBox = new Textbox(GameObject.getResource("/Sprites/UI/TestTextbox.jpg"), new Position(0, 400));
+        textBox = new Textbox(GameObject.getResource("/Sprites/UI/TestTextbox.jpg"));
         add(textBox);
+        //Set up the settingsMenu
+        settingsMenu = new SettingsMenu();
+        add(settingsMenu);
     }
 
     @Override
@@ -25,7 +29,7 @@ public class UIManager extends JLayeredPane
     {
         super.paintComponent(g);
         //Screen black
-        if(showBlackScreen)
+        if(showBlackScreen || DebugConsole.OVERRIDE_BLACKSCREEN)
         {
             setOpaque(true);
             setBackground(new Color(0,0,0,255));
@@ -74,5 +78,10 @@ public class UIManager extends JLayeredPane
     public Textbox getTextbox()
     {
         return textBox;
+    }
+
+    public SettingsMenu getSettingsMenu()
+    {
+        return settingsMenu;
     }
 }

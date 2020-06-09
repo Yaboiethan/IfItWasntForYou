@@ -4,7 +4,6 @@ dialogue, walking colliders, stuff like that
  */
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
-import java.io.File;
 
 public class NPC extends GameObject
 {
@@ -90,7 +89,7 @@ public class NPC extends GameObject
         anim.UpdateAnimator();
         myTrig.UpdateCollider();
 
-        if(testEvent != null && !testEvent.getIfDone())
+        if(testEvent != null && !testEvent.getIfDone()) //Check if testEvent is done
         {
             testEvent.Update();
         }

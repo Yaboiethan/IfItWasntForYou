@@ -11,10 +11,11 @@ public class DebugConsole extends JFrame
     private JTextArea viewArea;
     //Used to keep track of what commands are valid
     private final String[] commands = {"!help", "!toggleColliders", "!toggleMouseCoors", "!showCenter",
-            "!togglePos", "!toggleAnim", "!showTarotDeck", "!toggleTextboxVisuals"};
+            "!togglePos", "!toggleAnim", "!showTarotDeck", "!toggleTextboxVisuals", "!showBlackScreen"};
     private final String[] descriptions = {"Displays all commands", "Toggles Collider visuals",
             "Toggle Mouse Coordinates", "Displays center of object", "Shows object Position",
-            "Show object animation information", "Displays order of Tarot Cards", "Show/Hide Textbox visual components"};
+            "Show object animation information", "Displays order of Tarot Cards",
+            "Show/Hide Textbox visual components", "Show/Hide Black Screen"};
 
     //Static debug variables to enact changes
     public static boolean SHOW_COLLIDERS;
@@ -23,6 +24,7 @@ public class DebugConsole extends JFrame
     public static boolean SHOW_OBJECT_POSITION;
     public static boolean SHOW_ANIMATOR_INFO;
     public static boolean OVERRIDE_TEXTBOX_VISUALS;
+    public static boolean OVERRIDE_BLACKSCREEN;
 
 
     //FOR USE OF TESTING DEBUG LOG
@@ -56,7 +58,7 @@ public class DebugConsole extends JFrame
         textField = new JTextArea();
         textField.setBackground(Color.DARK_GRAY);
         textField.setForeground(Color.GREEN);
-        textField.setPreferredSize(new Dimension(300,50));
+        textField.setPreferredSize(new Dimension(300,45));
         mainArea.add(textField, BorderLayout.SOUTH);
 
 
@@ -165,6 +167,11 @@ public class DebugConsole extends JFrame
             case 7: //Override textbox visuals
                 OVERRIDE_TEXTBOX_VISUALS = !OVERRIDE_TEXTBOX_VISUALS;
                 AddTextToView("Textbox Override = " + OVERRIDE_TEXTBOX_VISUALS);
+                break;
+
+            case 8: //Override black screen
+                OVERRIDE_BLACKSCREEN = !OVERRIDE_BLACKSCREEN;
+                AddTextToView("Blackscreen Override = " + OVERRIDE_BLACKSCREEN);
                 break;
         }
     }

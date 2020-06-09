@@ -10,6 +10,7 @@ public class GameRunner {
     static GameFrame eGui;
     public static Player player;
     private static TarotDeck deck;
+    private static boolean isReady = false;
 
     //ArrayLists for updating
     private static ArrayList<Collider> colliders = new ArrayList<>();
@@ -30,6 +31,8 @@ public class GameRunner {
 
     private static void Initialize()
     {
+        //Enable black screen while loading
+        GameFrame.uiManager.setShowBlackScreen(true);
         //Add the first card
         TarotCard testCard = deck.GetCard(0);
         testCard.setPosition(150, 280);
@@ -38,7 +41,6 @@ public class GameRunner {
 
         //Add MarketCollider
         SceneObject testCollider = new SceneObject(new Position(100,100), "Market Tent");
-        //testCollider.myCol.UpdateCollider();
         eGui.addToPlayArea(testCollider);
 
         //Add TestNPC
@@ -60,6 +62,9 @@ public class GameRunner {
         });
 
         eGui.pack();
+        //Disable black screen, since done loading
+        GameFrame.uiManager.setShowBlackScreen(false);
+        isReady = true;
         //Start the gameUpdate
         GameUpdate();
     }
@@ -70,8 +75,16 @@ public class GameRunner {
      */
     private static void GameUpdate()
     {
+        //TODO REMOVE BELOW
+        //Testing manual resolution override
+        SettingsMenu.setScreenResolution(eGui, 0);
         while (eGui.isVisible())
         {
+            if(!isReady) //Check if ready
+            {
+                continue;
+            }
+
             //UIManager Update
             GameFrame.uiManager.Update();
 

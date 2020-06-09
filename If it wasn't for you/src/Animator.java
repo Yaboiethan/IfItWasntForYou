@@ -89,10 +89,11 @@ public class Animator
                     //Reset animation variables
                     curFrame = 0;
                     timer = 0;
-                    return;
                 }
+                return;
             }
         }
+
         try //Throw exception if animation not found
         {
             throw new Exception("Animation '" + n +  "' does not exist");

@@ -8,6 +8,7 @@ The Player class is the vessel of the player's inputs, and respond directly to w
  */
 
 import java.awt.*;
+import java.io.File;
 
 public class Player extends GameObject
 {
@@ -15,12 +16,14 @@ public class Player extends GameObject
     public boolean isMoving;
     private static int speed = 2;
     private static char currentKey;
-    private Collider myCol;
     private boolean mNorth = true;
     private boolean mEast = true;
     private boolean mSouth = true;
     private boolean mWest = true;
+
+    //Components
     private Animator anim;
+    private Collider myCol;
     //Collider storage
     /*
     0 == NORTH
@@ -29,6 +32,7 @@ public class Player extends GameObject
     3 == WEST
      */
     Collider[] touchedCols = new Collider[4];
+    private AudioPlayer audioPlayer;
 
     public Player(Position startingPos) //Fill constuctor
     {
@@ -39,6 +43,8 @@ public class Player extends GameObject
         setPreferredSize(getSpriteSize());
         //Set up components
         myCol = new Collider(this);
+        audioPlayer = new AudioPlayer();
+        audioPlayer.loadClip("TestSound");
     }
 
     public void InitializeAnimator()
@@ -117,6 +123,7 @@ public class Player extends GameObject
             if(m)
             {
                 anim.setCurrentAnimation("Walking_" + Position.getDirectionAbbrev(Position.charToDirection(currentKey)));
+                //audioPlayer.play(); //Hey it works ;)
             }
             else
             {

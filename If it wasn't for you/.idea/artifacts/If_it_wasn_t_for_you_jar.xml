@@ -3,6 +3,7 @@
     <output-path>$PROJECT_DIR$/out/artifacts/If_it_wasn_t_for_you_jar</output-path>
     <root id="archive" name="If it wasn't for you.jar">
       <element id="module-output" name="If it wasn't for you" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/libtiled-0.17.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>
