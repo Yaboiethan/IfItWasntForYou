@@ -10,10 +10,14 @@ public class GameFrame extends JFrame
 {
     private static JLayeredPane playArea = new JLayeredPane();
     public static UIManager uiManager;
+    private static MapBuilder mapBuilder;
 
     public GameFrame()
     {
         Initialize();
+        mapBuilder = new MapBuilder();
+        mapBuilder.loadTileMap(null);
+        mapBuilder.buildMapToPanel(this);
     }
 
     private void Initialize()
@@ -28,11 +32,14 @@ public class GameFrame extends JFrame
         uiManager = new UIManager(this);
         add(uiManager);
 
+
         //Set up the play area
         playArea.setPreferredSize(getSize());
+        playArea.setOpaque(false);
         playArea.setLayout(new BorderLayout());
         playArea.setBorder(BorderFactory.createTitledBorder("Play Area"));
         add(playArea);
+
 
         //Add player keylisteners
         addKeyListener(new KeyAdapter() {
@@ -80,6 +87,15 @@ public class GameFrame extends JFrame
 
     public void addToPlayArea(JComponent c)
     {
+        //Set layering
+        if(c instanceof RenderableTile)
+        {
+            playArea.setLayer(c, ((RenderableTile) c).getLayerId());
+        }
+        else
+        {
+            playArea.setLayer(c, 1);
+        }
         playArea.add(c);
         revalidate();
         repaint();
