@@ -1,5 +1,6 @@
 /*
-RenderableTiles are low-resource representations of tiles created by the MapBuilder
+RenderableTiles are low-resource representations of tiles created by the MapBuilder.
+They have a tile painted on to them and then disable repainting so it's not called every frame
  */
 
 import javax.swing.*;

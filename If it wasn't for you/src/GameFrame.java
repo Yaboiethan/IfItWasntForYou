@@ -1,6 +1,7 @@
 /*
 The GameFrame is the actual JFrame object that contains the game elements, even though they are added from the GameRunner
  */
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
@@ -16,7 +17,8 @@ public class GameFrame extends JFrame
     {
         Initialize();
         mapBuilder = new MapBuilder();
-        mapBuilder.loadTileMap(null);
+        mapBuilder.setTileScale(2.3);
+        mapBuilder.loadTileMap("TestMap");
         mapBuilder.buildMapToPanel(this);
     }
 
@@ -31,7 +33,6 @@ public class GameFrame extends JFrame
         //Set up the UI Layer
         uiManager = new UIManager(this);
         add(uiManager);
-
 
         //Set up the play area
         playArea.setPreferredSize(getSize());

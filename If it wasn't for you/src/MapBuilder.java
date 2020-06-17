@@ -19,22 +19,30 @@ public class MapBuilder
     private int tileSize;
     private org.tiledreader.TiledMap map;
     private TiledTileset mapTileSet;
+    private double tileScale;
 
     public MapBuilder()
     {
         tileSize = 0;
         map = null;
         mapTileSet = null;
+        tileScale = 0;
     }
 
     public void loadTileMap(String name)
     {
+        if(name == null)
+        {
+            return;
+        }
+
         if(map == null || mapTileSet == null)
         {
             GameRunner.debugConsole.AddTextToView("Tiled Map " + name + " failed to be loaded");
         }
-        //TODO Remove direct reference
-        map = TiledReader.getMap("C:\\Users\\ethan\\Desktop\\TestMap\\TestMap.tmx");
+        String path = System.getProperty("user.dir") + "/resources/TiledMaps/" + name + "/" + name + ".tmx";
+        path = path.replaceAll("%20", " ");
+        map = TiledReader.getMap(path);
         //Get the tileset
         mapTileSet = map.getTilesets().get(0); //Load the first mapset
         tileSize = mapTileSet.getTileHeight(); //Height and Width MUST be the same
@@ -77,11 +85,16 @@ public class MapBuilder
                 TiledTile t = layer.getTile(x,y);
                 Image subImg = tileset.getSubimage(t.getTilesetX() * tileSize, t.getTilesetY() * tileSize, tileSize, tileSize);
                 RenderableTile renT = new RenderableTile(subImg, new Position(), 0);
-                renT.scale(1.4);
+                renT.scale(tileScale);
                 renT.setPosition(new Position(x * renT.getTileSize(), y * renT.getTileSize()));
                 toAdd.addToPlayArea(renT);
             }
         }
+    }
+
+    public void setTileScale(double s)
+    {
+        tileScale = s;
     }
     
     public int getTileSize()

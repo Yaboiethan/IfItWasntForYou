@@ -15,7 +15,7 @@ public class SceneObject extends GameObject
         setSprite("/Sprites/Background/" + fileName + ".png");
         setPreferredSize(getSpriteSize());
         ScaleSprite(1.4);
-        myCol = new OffsetCollider(this, new Position(0, 62), new Dimension(0, -64));
+        myCol = new OffsetCollider(this, new Position(), new Dimension());
     }
 
     //Overriding the base paintComponent to add collider command
@@ -31,5 +31,13 @@ public class SceneObject extends GameObject
             g2d.draw(myCol.getColObject());
             g2d.dispose();
         }
+    }
+
+    public void setColliderOffset(Position offP, Dimension offD)
+    {
+        myCol.setOffsetPos(offP);
+        myCol.setHeightOffset((int) offD.getHeight());
+        myCol.setWidthOffset((int) offD.getWidth());
+        myCol.setCollider();
     }
 }

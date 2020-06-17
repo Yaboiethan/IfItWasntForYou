@@ -2,6 +2,8 @@
 The GameRunner class contains all the game elements themselves and the various lists needed to keep the game running
 //TODO Generate Maps through libtiled library
  */
+
+import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 
@@ -31,8 +33,6 @@ public class GameRunner {
 
     private static void Initialize()
     {
-        //Enable black screen while loading
-        GameFrame.uiManager.setShowBlackScreen(true);
         //Add the first card
         TarotCard testCard = deck.GetCard(0);
         testCard.setPosition(150, 280);
@@ -41,6 +41,7 @@ public class GameRunner {
 
         //Add MarketCollider
         SceneObject testCollider = new SceneObject(new Position(100,100), "Market Tent");
+        testCollider.setColliderOffset(new Position(0, 70), new Dimension(0, -72));
         eGui.addToPlayArea(testCollider);
 
         //Add TestNPC
